@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<install version="1.5" type="plugin" group="vmpayment" method="upgrade">
+    <name>Moip</name>
+    <creationDate>Maio 2012</creationDate>
+    <author>Luiz Felipe Weber</author>
+    <authorUrl>http://www.webgenium.com.br</authorUrl>
+    <copyright>Copyright (C) 2012. All rights reserved.</copyright>
+    <license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
+    <version>1.0</version>
+    <description>Plugin de pagamento
+	&lt;div style=&quot;background:#E5F5FF;border:1px solid #99D6FF;padding:10px;margin:10px; -box-shadow: inset 0px 0px 10px #fff, 0px 0px 5px #ccc; -webkit-box-shadow: inset 0px 0px 10px #fff, 0px 0px 5px #ccc; -moz-box-shadow: inset 0px 0px 10px #fff, 0px 0px 5px #ccc;&quot;&gt;
+		&lt;h1&gt;Plugin de pagamento Moip para Virtuemart 2.0 - Api Transparente.&lt;/h1&gt;
+		&lt;div style=&quot;float:right;width: 20%&quot;&gt;
+		&lt;img src=&quot;../plugins/vmpayment/moip/logo_moip.png&quot; /&gt;
+		&lt;/div&gt;
+		&lt;div&gt;&lt;em&gt;Passo 1&lt;/em&gt; - Crie sua conta Moip ( caso não exista ) e solicite a ativação da API Moip. &lt;/div&gt;
+		&lt;div&gt;&lt;em&gt;Passo 2&lt;/em&gt; - Habilite o plugin aqui &lt;a href=&quot;index.php?option=com_plugins&amp;view=plugins&amp;filter_search=moip&quot;&gt;Administrar Plugins&lt;/a&gt;&lt;/div&gt;
+		&lt;div&gt;&lt;em&gt;Passo 3&lt;/em&gt; - Instale Plugin por esta tela &lt;a href=&quot;index.php?option=com_virtuemart&amp;view=paymentmethod&quot;&gt;Métodos de pagamento&lt;/a&gt;&lt;/div&gt;
+		&lt;div&gt;&lt;em&gt;Passo 3.1&lt;/em&gt; - &lt;b&gt;Clique em Novo Método de Pagamento&lt;/b&gt; e preencha as informações:&lt;/div&gt;
+		&lt;div&gt;* Nome do Pagamento: &lt;b&gt;Cartões de crédito e débito, transferência e boleto bancário ( Moip )&lt;/b&gt;&lt;/div&gt;
+		&lt;div&gt;* Publicado: &lt;b&gt;Sim&lt;/b&gt;&lt;/div&gt;
+		&lt;div&gt;* Descrição do pagamento: &lt;b&gt;Pague com cartão de crédito, boleto ou saldo Moip&lt;/b&gt;&lt;/div&gt;
+		&lt;div&gt;* Método de pagamento: &lt;b&gt;Moip&lt;/b&gt;&lt;/div&gt;
+		&lt;div&gt;* Grupo de Compradores: &lt;b&gt;-default-&lt;/b&gt;&lt;/div&gt;
+		&lt;div&gt;&lt;em&gt;Passo 3.2&lt;/em&gt; - &lt;b&gt;Clique em Salvar&lt;/b&gt;.&lt;/div&gt;
+		&lt;div&gt;&lt;em&gt;Passo 4&lt;/em&gt; - Na &lt;b&gt;aba configurações&lt;/b&gt;, preencha os dados:&lt;/div&gt;
+
+		&lt;div&gt; # Configurações do Plugin de Pagamento &lt;/div&gt;		
+		&lt;div&gt;* Logotipos: &lt;b&gt;&lt;/b&gt;&lt;/div&gt;
+		&lt;div&gt;* Modo de teste &lt;b&gt;( Sim ou Não ) &lt;/b&gt;&lt;/div&gt;
+		&lt;div&gt;* Token (teste) &lt;b&gt; Menu do Moip FERRAMENTAS / API / Chaves de acesso &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;* Chave de Acesso (teste) &lt;b&gt; Menu do Moip FERRAMENTAS / API / Chaves de acesso &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;* Token (produção) &lt;b&gt; Menu do Moip FERRAMENTAS / API / Chaves de acesso &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;* Chave de Acesso (produção) &lt;b&gt; Menu do Moip FERRAMENTAS / API / Chaves de acesso &lt;/b&gt;&lt;/div&gt;				
+		&lt;div&gt;* Valor Mínimo &lt;b&gt; 0,01 &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;* Mensagem Pagamento &lt;b&gt; Mensagem que vai no detalhamento da compra dentro do Moip &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;* Status Postado pelo Moip &lt;b&gt; (Compra Aprovada, Em Análise, Estornada, Aguardando Pagamento, Cancelada ) &lt;/b&gt;&lt;/div&gt;				
+		&lt;div&gt; &lt;/div&gt;		
+		&lt;div&gt;* Configuração Parcelamento &lt;/div&gt;		
+		&lt;div&gt;** Max. Parcelas Sem Juros &lt;b&gt; 3 &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;** Max. Parcelas Com Juros &lt;b&gt; 12 &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;** Taxa de Juros Crédito à vista &lt;b&gt; (0.035) &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;* CONFIG &lt;b&gt; VALOR_CONFIG &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;* CONFIG &lt;b&gt; VALOR_CONFIG &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;* CONFIG &lt;b&gt; VALOR_CONFIG &lt;/b&gt;&lt;/div&gt;		
+	&lt;/div&gt;	
+	&lt;div&gt;	Licença: &lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GNU/GPL v3&lt;/a&gt; - Desenvolvido por Luiz Weber - &lt;a href=&quot;http://weber.eti.br&quot;&gt;Weber TI&lt;/a&gt; | &lt;a href=&quot;http://webgenium.com.br&quot;&gt;Webgenium System&lt;/a&gt;
+	
+	</description>
+    <files>
+        <filename plugin="moip">moip.php</filename>
+        <filename>retorno.php</filename>
+        <filename>licenca-gplv3.txt</filename>
+        <filename>leiame.txt</filename>
+        <filename>gplv3-license.txt</filename>
+        <filename>logo_moip.png</filename>
+		<folder>assets</folder>
+		<folder>imagens</folder>
+    </files>
+	<languages>
+	<language tag="pt-BR">pt-BR.plg_vmpayment_moip.ini</language>
+	<language tag="en-GB">en-GB.plg_vmpayment_moip.ini</language>
+    </languages>
+	
+    <params addpath="/administrator/components/com_virtuemart/elements">
+        <param type="vmjpluginwarning" />
+        <param	name="payment_logos" type="vmfiles" label="VMPAYMENT_STANDARD_LOGOS"
+		description="VMPAYMENT_STANDARD_LOGOS_DESC"
+		directory="/images/stories/virtuemart/payment"
+		default="default" hide_default="1" hide_none="1"
+		stripext="0"   exclude="^_" />	        
+
+		<param name="modo_teste" type="list" default="1" label="Modo de teste">
+            <option value="1">COM_VIRTUEMART_YES</option>
+            <option value="0">COM_VIRTUEMART_NO</option>
+        </param>
+
+		<param type="spacer" default="Teste" />
+		<param name="token_teste" type="text" size="40"  label="Token" description="Informe aqui o código da token cadastrado no Sandbox do Moip (teste)" default="IKNUXXVNXLRUO4CGAI4SWPIIVSXXB9PT"/>
+		<param name="chave_teste" type="text" size="40"  label="Chave de acesso" description="Informe aqui a chave de acesso da loja (teste)" default="NPNKUYGTHB51YMGURH5KZ4NJPFJPOUVQDCNWMERM"/>
+
+		<param type="spacer" default="Produção" />
+		<param name="token_producao" type="text" size="40"  label="Token" description="Informe aqui o código da token cadastrado no Sandbox do Moip (produção)" default=""/>
+		<param name="chave_producao" type="text" size="40"  label="Chave de acesso" description="Informe aqui a chave de acesso da loja (produção)" default=""/>
+
+		<param type="spacer" default="Outras configurações" />
+        <param name="valor_minimo" type="text" size="10"  label="Valor mínimo" description="Valor mínimo para compras na loja." default="0.01"/> 		
+        <param name="mensagem_pagamento" type="text" size="30"  label="Mensagem Pagamento" description="Mensagem que aparece no ambiente do Moip: Pagamento para a loja X." default="Pagamento para a loja X"/> 		
+		
+        <param type="spacer" default="Status postado pela Moip" />
+        <param name="transacao_concluida" type="vmorderstate" default="C" label="Aprovado" description="Status aprovado dentro do seu Virtuemart" />
+        <param name="transacao_em_analise" type="vmorderstate" label="Em Análise" description="Status em Análise pelo sistema do Moip" />
+        <param name="transacao_estornada" type="vmorderstate" label="Estornada" description="Status Estornada pelo sistema do Moip" />
+        <param name="transacao_nao_finalizada" type="vmorderstate" default="A" label="Aguardando Pagto" description="Status Aguardando Pagto dentro do seu Virtuemart" />
+        <param name="transacao_cancelada" type="vmorderstate" default="X" label="Cancelado" description="Status Cancelado dentro do seu Virtuemart" />
+		
+		<param type="spacer" default="Configuração Parcelamento" />		
+		<param name="max_parcela_sem_juros" type="text" size="10"  label="Máx. parcelas Sem Juros" description="Número total de parcelas sem juros" default="3"/> 
+        <param name="max_parcela_com_juros" type="text" size="10"  label="Máx. parcelas Com Juros" description="Número total de parcelas com juros" default="12" /> 
+		
+		<param name="taxa_credito" type="text" size="12"  label="Taxa Crédito à vista" description="Taxa para transações 1x no Crédito (0.01 = 1%)" default="0.035" />
+		<param name="taxa_parcelado" type="text" size="12"  label="Taxa Parcelado" description="Taxa para transações parcelado em mais de 2x no Crédito  (0.01 = 1%)" default="0.045"/>
+		
+		<param type="spacer" default="Formas de Pagamento Aceitas" />		
+		<param name="ativar_boleto" type="list" default="1" label="Ativar Boleto">
+			<option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>		
+		</param>		
+		<param name="ativar_cartao" type="list" default="1" label="Ativar Cartões">
+			<option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>		
+		</param>
+		<param name="ativar_debito" type="list" default="1" label="Ativar Débito em Conta">
+			<option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>		
+		</param>
+		
+		<param type="spacer" default="Cartões de Crédito Aceitos" />		
+		<param name="cartao_visa" type="list" default="1" label="Visa">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>
+		<param name="cartao_master" type="list" default="1" label="Master">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>
+		<param name="cartao_hipercard" type="list" default="1" label="Hipercard">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>
+		<param name="cartao_diners" type="list" default="1" label="Diners">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>
+		<param name="cartao_amex" type="list" default="0" label="Amex">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>	
+		
+		<param type="spacer" default="Pagamento com Débito Aceitos" />		
+		<param name="debito_bb" type="list" default="1" label="Débito BB">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>
+		<param name="debito_bradesco" type="list" default="1" label="Débito Bradesco">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>
+		<param name="debito_banrisul" type="list" default="1" label="Débito Banrisul">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>
+		<param name="debito_itau" type="list" default="1" label="Débito Itaú">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>
+		
+		<param type="spacer" default="Pagamento com Boleto Aceitos" />
+		<param name="boleto_itau" type="list" default="1" label="Boleto Itaú">
+            <option value="0">COM_VIRTUEMART_NO</option>            
+            <option value="1">COM_VIRTUEMART_YES</option>
+        </param>
+		
+		
+		<param type="spacer" default="Extras" />		
+		<param name="countries" type="vmcountries"  scope="com_virtuemart" default="" label="Países" description="Países para validar este pagamento"/>
+		<param name="min_amount" type="text"  label="Mínimo da Compra" description="Valor mínimo da compra pra utilizar a Moip" />
+		<param name="max_amount" type="text"  label="Máximo da Compra" description="Valor Máximo da compra para utilizar a Moip" />
+		<param name="cost_per_transaction" type="text"  label="Custo por Transação" description="Custo total por transação" />
+		<param name="cost_percent_total" type="text"  label="Custo percentual total" description="Custo percentual total pela venda" />
+		<param name="tax_id" type="vmtaxes" scope="com_virtuemart"  label="Tarifa/Imposto" description="Imposto ou tarifa aplicada" />
+		
+		
+	<param type="spacer" default="Licença: &lt;a href='http://www.gnu.org/licenses/gpl-3.0.html'&gt;GNU/GPL v3&lt;/a&gt; - Desenvolvido por Luiz Weber - &lt;a href='http://weber.eti.br'&gt;Weber TI&lt;/a&gt; | &lt;a href='http://webgenium.com.br'&gt;Webgenium System&lt;/a&gt;" />
+    </params>
+</install>

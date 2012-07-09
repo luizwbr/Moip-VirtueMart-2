@@ -19,7 +19,7 @@
 
 		if (!(result.card_type != null)) {
 			jQuery('#card_number').removeClass('valid');
-			jQuery('input[name=tipo_pgto]').attr('checked',false);
+			//jQuery('input[name=tipo_pgto]').attr('checked',false);
 			//jQuery('input[name=tipo_pgto]').attr('disabled',true);
 			jQuery('.div_parcelas').hide();
 			return;
@@ -27,7 +27,7 @@
 
 		if (result.card_type.name != '') {
 			var id = '#tipo_'+cartoes[result.card_type.name];
-			jQuery(id).attr('checked',true);
+			//jQuery(id).attr('checked',true);
 			//jQuery(id).removeAttr('disabled');
 			show_parcelas(cartoes[result.card_type.name]);
 		}

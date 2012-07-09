@@ -597,18 +597,18 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
         $html = '<table class="adminlist">' . "\n";
         $html .=$this->getHtmlHeaderBE();
-        $html .= $this->getHtmlRowBE('PAYMENT', $paymentTable->payment_name);
-		$html .= $this->getHtmlRowBE('PAYMENT_DATE', $paymentTable->modified_on);
-        $html .= $this->getHtmlRowBE('CODIGO_MOIP', $paymentTable->codigo_moip);
-        $html .= $this->getHtmlRowBE('STATUS', $paymentTable->status . ' - ' . $paymentTable->msg_status);
-        $html .= $this->getHtmlRowBE('COFRE', $paymentTable->cofre);
-        $html .= $this->getHtmlRowBE('TOTAL_CURRENCY', $paymentTable->payment_order_total . ' ' . $paymentTable->payment_currency);
-		$html .= $this->getHtmlRowBE('TYPE_TRANSACTION', $paymentTable->type_transaction);
-		$html .= $this->getHtmlRowBE('NOME_TITULAR_CARTAO', $paymentTable->nome_titular_cartao);
-		$html .= $this->getHtmlRowBE('NASCIMENTO_TITULAR_CARTAO', $paymentTable->nascimento_titular_cartao);
-		$html .= $this->getHtmlRowBE('TELEFONE_TITULAR_CARTAO', $paymentTable->telefone_titular_cartao);
-		$html .= $this->getHtmlRowBE('CPF_TITULAR_CARTAO', $paymentTable->cpf_titular_cartao);
-        $html .= $this->getHtmlRowBE('LOG', $paymentTable->log);
+        $html .= $this->getHtmlRowBE('MOIP_PAYMENT', $paymentTable->payment_name);
+		$html .= $this->getHtmlRowBE('MOIP_PAYMENT_DATE', $paymentTable->modified_on);
+        $html .= $this->getHtmlRowBE('MOIP_CODIGO_MOIP', $paymentTable->codigo_moip);
+        $html .= $this->getHtmlRowBE('MOIP_STATUS', $paymentTable->status . ' - ' . $paymentTable->msg_status);
+        $html .= $this->getHtmlRowBE('MOIP_COFRE', $paymentTable->cofre);
+        $html .= $this->getHtmlRowBE('MOIP_TOTAL_CURRENCY', $paymentTable->payment_order_total . ' ' . $paymentTable->payment_currency);
+		$html .= $this->getHtmlRowBE('MOIP_TYPE_TRANSACTION', $paymentTable->type_transaction);
+		$html .= $this->getHtmlRowBE('MOIP_NOME_TITULAR_CARTAO', $paymentTable->nome_titular_cartao);
+		$html .= $this->getHtmlRowBE('MOIP_NASCIMENTO_TITULAR_CARTAO', $paymentTable->nascimento_titular_cartao);
+		$html .= $this->getHtmlRowBE('MOIP_TELEFONE_TITULAR_CARTAO', $paymentTable->telefone_titular_cartao);
+		$html .= $this->getHtmlRowBE('MOIP_CPF_TITULAR_CARTAO', $paymentTable->cpf_titular_cartao);
+        $html .= $this->getHtmlRowBE('MOIP_LOG', $paymentTable->log);
         $html .= '</table>' . "\n";
         return $html;
     }
@@ -1215,8 +1215,13 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			if (!empty($moipTable)) {
 				$html .= $this->getHtmlRowBE('MOIP_ORDER_NUMBER', $moipTable->order_number);
 				$html .= $this->getHtmlRowBE('MOIP_PAYMENT_DATE', $moipTable->modified_on);
+				$html .= '<tr><td colspan="2"><br /></td></tr>';
+
+				if ($moipTable->codigo_moip) {
+					$html .= $this->getHtmlRowBE('MOIP_CODIGO_MOIP','<b>'.$moipTable->codigo_moip.'</b>');
+				}
 				
-				if ($moipTable->status) {
+				if ($moipTable->msg_status) {
 					$moip_status = '<b>'.$moipTable->status. " - " . $moipTable->msg_status.'</b><br />';
 				} else {					
 					$moip_status = 'Transação em Andamento';
@@ -1229,10 +1234,8 @@ class plgVmPaymentMoip extends vmPSPlugin {
 				}
 
 				$html .= $this->getHtmlRowBE('MOIP_STATUS', $moip_status);
-
-				if ($moipTable->codigo_moip) {
-					$html .= $this->getHtmlRowBE('MOIP_CODIGO_MOIP', $moipTable->codigo_moip);
-				}
+				
+				$html .= '<tr><td colspan="2"><br /></td></tr>';
 				if ($moipTable->cofre) {
 					$html .= $this->getHtmlRowBE('MOIP_COFRE', $moipTable->cofre);
 				}

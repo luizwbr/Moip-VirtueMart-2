@@ -271,9 +271,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		
 			// envia emails e redireciona
 			$novo_status = $method->transacao_nao_finalizada;
-			// @todo
-			// Trocar aqui pra poder enviar o email
-			return $this->processConfirmedOrderPaymentResponse(2, $cart, $order, $html, $dbValues['payment_name'], $novo_status);
+			return $this->processConfirmedOrderPaymentResponse(1, $cart, $order, $html, $dbValues['payment_name'], $novo_status);
 		
 		} else {
 			$this->token_api 	= null;
@@ -1039,8 +1037,6 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			$notificacao .= "\n\n";
 			$notificacao .= JText::_('VMPAYMENT_MOIP_NOTIFY_AUTHENTICATE')."<a href='http://www.moip.com.br'>Moip</a>";
 			
-			// @todo montar link para reimprimir boleto
-			
 			if ($virtuemart_order_id) {
 				// send the email only if payment has been accepted
 				if (!class_exists('VirtueMartModelOrders'))
@@ -1054,8 +1050,6 @@ class plgVmPaymentMoip extends vmPSPlugin {
 				$order['virtuemart_order_id'] 	= $virtuemart_order_id;
 				$order['comments'] 				= $notificacao;
 				$order['customer_notified'] 	= 1;		
-				// @todo here
-				$order['customer_notified'] 	= 0;		
 
 				$modelOrder->updateStatusForOneOrder($virtuemart_order_id, $order, true);
 				if ($nb_history == 1) {
@@ -1160,8 +1154,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
 						$order['order_status'] = $notificacao_status['status'];
 						$order['virtuemart_order_id'] = $virtuemart_order_id;
-						// @todo here
-						$order['customer_notified'] = 0;
+						$order['customer_notified'] = 1;
 						$order['comments'] = $notificacao;
 						$modelOrder->updateStatusForOneOrder($virtuemart_order_id, $order, true);
 					}

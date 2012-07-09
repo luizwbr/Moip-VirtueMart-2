@@ -74,7 +74,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
             'debito_bradesco'=> array('', 'string'),
             'debito_banrisul'=> array('', 'string'),
             'debito_itau'=> array('', 'string'),
-            'boleto_itau'=> array('', 'string'),	
+            'boleto_bradesco'=> array('', 'string'),	
         );
         $this->setConfigParameterable($this->_configTableFieldName, $varsToPush);
 
@@ -125,6 +125,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
             'log' => ' varchar(200) DEFAULT NULL',
             'status' => ' char(1) not null default \'P\'',
             'msg_status' => ' varchar(255) NOT NULL',
+            'url_redirecionar' => ' varchar(255) NOT NULL',
             'tax_id' => 'smallint(11) DEFAULT NULL',
         );
 	    return $SQLfields;
@@ -350,7 +351,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		<form name="pagamento_boleto" onsubmit="return submeter_boleto(this)" id="pagamento_boleto"  style="display:none">
 		<ul>
 			<li>
-				<input type="hidden" value="1" id="tipo_pgto_boleto" name="tipo_pgto_boleto" /><img src="'.$this->url_imagens.'itau_boleto.jpg"/>
+				<input type="hidden" value="1" id="tipo_pgto_boleto" name="tipo_pgto_boleto" /><img src="'.$this->url_imagens.'bradesco_boleto.jpg"/>
 			</li>
 		</ul>
 		<br style="clear:both"/>
@@ -411,7 +412,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
 						<li>
 							<label for="cvv">'.JText::_('VMPAYMENT_MOIP_TRANSACTION_VERIFY_NUMBER2').'</label>
-							<input name="cvv" id="cvv" maxlength="3" type="text" size="3" style="width: 68px"/>
+							<input name="cvv" id="cvv" maxlength="4" type="text" size="3" style="width: 68px"/>
 						</li>
 					</ul>
 				</li>
@@ -539,7 +540,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		$pagamento = $db->loadObjectList();
 		
 		$cartao_bandeira 	= JRequest::getVar('cartao_bandeira','');
-		$cofre 						= JRequest::getVar('cofre','');
+		$cofre 					= JRequest::getVar('cofre','');
 		$parcelas 				= JRequest::getVar('parcelas','');
 		$tipo_pagamento 	= JRequest::getVar('tipo_pagamento','');
 
@@ -598,8 +599,8 @@ class plgVmPaymentMoip extends vmPSPlugin {
         $html .=$this->getHtmlHeaderBE();
         $html .= $this->getHtmlRowBE('PAYMENT', $paymentTable->payment_name);
 		$html .= $this->getHtmlRowBE('PAYMENT_DATE', $paymentTable->modified_on);
-        $html .= $this->getHtmlRowBE('STATUS', $paymentTable->status . ' - ' . $paymentTable->msg_status);
         $html .= $this->getHtmlRowBE('CODIGO_MOIP', $paymentTable->codigo_moip);
+        $html .= $this->getHtmlRowBE('STATUS', $paymentTable->status . ' - ' . $paymentTable->msg_status);
         $html .= $this->getHtmlRowBE('COFRE', $paymentTable->cofre);
         $html .= $this->getHtmlRowBE('TOTAL_CURRENCY', $paymentTable->payment_order_total . ' ' . $paymentTable->payment_currency);
 		$html .= $this->getHtmlRowBE('TYPE_TRANSACTION', $paymentTable->type_transaction);
@@ -934,7 +935,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
       }
 	*/
 	function plgVmOnPaymentNotification() {
-		
+
 		if (!class_exists('VirtueMartCart'))
 			require(JPATH_VM_SITE . DS . 'helpers' . DS . 'cart.php');
 		if (!class_exists('shopFunctionsF'))
@@ -956,13 +957,12 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
 		if (!$virtuemart_order_id) {
 			return;
-		}		
-
+		}
 		$vendorId = 0;
 		$payment = $this->getDataByOrderId($virtuemart_order_id);		
 		if($payment->payment_name == '') {
 			return false;
-		}		
+		}
 
 		// recupera as informações do método de pagamento
 		$method = $this->getVmPluginMethod($pm);
@@ -976,12 +976,13 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		}
 
 		$status_pagamento	= JRequest::getVar('StatusPagamento');
-		$mensagem 				= JRequest::getVar('Mensagem');
-		$status 						= JRequest::getVar('Status');
-		$total_pago					= JRequest::getVar('TotalPago');
-		$forma_pagamento		= JRequest::getVar('FormaPagamento');
+		$mensagem 			= JRequest::getVar('Mensagem');
+		$status 					= JRequest::getVar('Status');
+		$total_pago			= JRequest::getVar('TotalPago');
+		$forma_pagamento	= JRequest::getVar('FormaPagamento');
 		$tipo_pagamento		= JRequest::getVar('TipoPagamento');
-		$timestamp					= date('Y-m-d').'T'.date('H:i:s');
+		$url_redirecionar		= JRequest::getVar('Url');
+		$timestamp				= date('Y-m-d').'T'.date('H:i:s');
 
 		// recupera as informações do pagamento
 		$db = JFactory::getDBO();
@@ -1017,11 +1018,12 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			$response_fields['status'] 							= $novo_status;
 			$response_fields['msg_status']					= $arr_status[$status];
 			$response_fields['virtuemart_paymentmethod_id'] = $pm;
-			$response_fields['payment_name'] 			= $payment->payment_name;
+			$response_fields['payment_name'] 				= $payment->payment_name;
 			$response_fields['order_number'] 				= $order_number;
-			$response_fields['codigo_moip'] 				= $codigo_moip;
-			$response_fields['virtuemart_order_id'] 	= $virtuemart_order_id;
+			$response_fields['codigo_moip'] 					= $codigo_moip;
+			$response_fields['virtuemart_order_id'] 		= $virtuemart_order_id;
 			$response_fields['type_transaction'] 			= $forma_pagamento.' - '.$tipo_pagamento;
+			$response_fields['url_redirecionar'] 				= $url_redirecionar;
 			$response_fields['log'] 								= $log;
 			$this->storePSPluginInternalData($response_fields, 'order_number', 'true');
 
@@ -1037,6 +1039,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			$notificacao .= "\n\n";
 			$notificacao .= JText::_('VMPAYMENT_MOIP_NOTIFY_AUTHENTICATE')."<a href='http://www.moip.com.br'>Moip</a>";
 			
+			// @todo montar link para reimprimir boleto
 			
 			if ($virtuemart_order_id) {
 				// send the email only if payment has been accepted
@@ -1110,7 +1113,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		
 		$nasp = JRequest::getVar('nasp','');
 
-		if ($nasp==1) {		
+		if ($nasp==1) {
 			$order_number = $this->order_id = $order_id = JRequest::getVar('id_transacao', '');			
 			$status_pagamento 			= JRequest::getVar('status_pagamento');
 			$this->tipo_pagamento 	= JRequest::getVar('tipo_pagamento');
@@ -1181,7 +1184,9 @@ class plgVmPaymentMoip extends vmPSPlugin {
 				return '';
 			}
 			$payment_name = $this->renderPluginName($method);
-			$html = $this->_getPaymentResponseHtml($paymentTable, $payment_name);
+			$modelOrder = VmModel::getModel('orders');
+			$orderdetails = $modelOrder->getOrder($virtuemart_order_id);								
+			$html = $this->_getPaymentResponseHtml($paymentTable, $payment_name, $orderdetails['details'], $method);
 
 			//We delete the old stuff
 			// get the correct cart / session
@@ -1191,10 +1196,16 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		return true;
 	}
 
-	function _getPaymentResponseHtml($moipTable, $payment_name) {
+	function _getPaymentResponseHtml($moipTable, $payment_name, $orderDetails=null, $method=null) {
 		$html = '<table>' . "\n";
 		$html .= $this->getHtmlRowBE('PAYPAL_PAYMENT_NAME', $payment_name);
 		$task = JRequest::getVar('task','');
+		$img_pagamentos = array();
+		$img_pagamentos['BoletoBancario - Boleto Bradesco'] = 'bradesco_boleto.jpg';
+		$img_pagamentos['DebitoBancario - Bradesco'] 			= 'bradesco_debito.jpg';
+		$img_pagamentos['DebitoBancario - BancoDoBrasil'] 	= 'bb_debito.jpg';
+		$img_pagamentos['DebitoBancario - Banrisul'] 			= 'banrisul_debito.jpg';
+		$img_pagamentos['DebitoBancario - Itau'] 				= 'itau_debito.jpg';
 		if ($task == 'pluginresponsereceived') {
 			JFactory::getApplication()->enqueueMessage(
 				JText::_('VMPAYMENT_MOIP_CHECK_TRANSACTION')
@@ -1204,18 +1215,47 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			if (!empty($moipTable)) {
 				$html .= $this->getHtmlRowBE('MOIP_ORDER_NUMBER', $moipTable->order_number);
 				$html .= $this->getHtmlRowBE('MOIP_PAYMENT_DATE', $moipTable->modified_on);
-				$html .= $this->getHtmlRowBE('MOIP_STATUS', '<b>'.$moipTable->status. " - " . $moipTable->msg_status.'</b><br />');
-				$html .= $this->getHtmlRowBE('MOIP_CODIGO_MOIP', $moipTable->codigo_moip);
-				$html .= $this->getHtmlRowBE('MOIP_COFRE', $moipTable->cofre);
+				
+				if ($moipTable->status) {
+					$moip_status = '<b>'.$moipTable->status. " - " . $moipTable->msg_status.'</b><br />';
+				} else {					
+					$moip_status = 'Transação em Andamento';
+					if ($orderDetails['BT']->order_status == $method->transacao_nao_finalizada and !$moipTable->codigo_moip) {
+						$url_imagem = JURI::root().DS.'plugins'.DS.'vmpayment'.DS.'moip'.DS.'imagens'.DS;
+						$url_imagem .= $img_pagamentos[$moipTable->type_transaction];
+						$imagem_redirecionar = '<img src="'.$url_imagem.'" border="0"/>';
+						$moip_status = '<div style="padding: 10px"><br />Faça o pagamento clicando aqui: <br /><a target="blank" href="'.$moipTable->url_redirecionar.'">'.$imagem_redirecionar.'</a><br /><br /></div>';
+					}
+				}
+
+				$html .= $this->getHtmlRowBE('MOIP_STATUS', $moip_status);
+
+				if ($moipTable->codigo_moip) {
+					$html .= $this->getHtmlRowBE('MOIP_CODIGO_MOIP', $moipTable->codigo_moip);
+				}
+				if ($moipTable->cofre) {
+					$html .= $this->getHtmlRowBE('MOIP_COFRE', $moipTable->cofre);
+				}
+
 				$html .= $this->getHtmlRowBE('MOIP_AMOUNT', $moipTable->payment_order_total. " " . $moipTable->payment_currency);
 				$html .= $this->getHtmlRowBE('MOIP_TYPE_TRANSACTION', $moipTable->type_transaction);
-				$html .= $this->getHtmlRowBE('MOIP_NOME_TITULAR_CARTAO', $moipTable->nome_titular_cartao);
-				$html .= $this->getHtmlRowBE('MOIP_NASCIMENTO_TITULAR_CARTAO', $moipTable->nascimento_titular_cartao);
-				$html .= $this->getHtmlRowBE('MOIP_TELEFONE_TITULAR_CARTAO', $moipTable->telefone_titular_cartao);
-				$html .= $this->getHtmlRowBE('MOIP_CPF_TITULAR_CARTAO', $moipTable->cpf_titular_cartao);
-				$html .= $this->getHtmlRowBE('MOIP_LOG', $moipTable->log);				
+
+				if ($moipTable->nome_titular_cartao) {
+					$html .= $this->getHtmlRowBE('MOIP_NOME_TITULAR_CARTAO', $moipTable->nome_titular_cartao);					
+				}
+				if ($moipTable->nascimento_titular_cartao) {
+					$html .= $this->getHtmlRowBE('MOIP_NASCIMENTO_TITULAR_CARTAO', $moipTable->nascimento_titular_cartao);
+				}
+				if ($moipTable->telefone_titular_cartao) {
+					$html .= $this->getHtmlRowBE('MOIP_TELEFONE_TITULAR_CARTAO', $moipTable->telefone_titular_cartao);					
+				}
+				if ($moipTable->cpf_titular_cartao) {
+					$html .= $this->getHtmlRowBE('MOIP_CPF_TITULAR_CARTAO', $moipTable->cpf_titular_cartao);				
+				}
+
+				$html .= $this->getHtmlRowBE('MOIP_LOG', $moipTable->log);
 				$html .= '</table>' . "\n";
-				$html .= '<br /> 
+				$html .= '<br />
 				<a href="'.$link_pedido.'" class="button">'.JText::_('VMPAYMENT_MOIP_ORDER_DETAILS').'</a>
 				' . "\n";
 			}

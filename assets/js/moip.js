@@ -161,7 +161,7 @@ function marcar_radio(id) {
 }
 
 jQuery(document).ready(function(){
-	jQuery('#cvv').mask("999");  
+	jQuery('#cvv').mask("999?9");  
 	jQuery('#telefone_titular').mask("(99) 9999-9999");  
 	jQuery('#cpf_titular').mask("999.999.999-99");
 	jQuery('#expiry_date').mask("99/99");	 
@@ -181,17 +181,16 @@ function erro_cartao(id) {
 
 function submeter_cartao(formulario) {	
     var id = 'form#'+formulario.id;
-	//jQuery(id+' input[type=submit]').val('Validando transação...');
 	
     var cartao_selecionado 	= jQuery(id+' input[name=tipo_pgto]:checked').val();
-	var parcela_selecionada = jQuery(id+' input[name=parcelamento]:visible:checked').val();
-	var numero_cartao 		= jQuery(id+' input#card_number').val();
-	var validade_cartao 	= jQuery(id+' input#expiry_date').val();
-	var cvv_cartao 			= jQuery(id+' input#cvv').val();
-	var titular_cartao 		= jQuery(id+' input#name_on_card').val();
-	var nascimento_titular 	= jQuery(id+' input#nascimento_titular').val();
-	var telefone_titular 	= jQuery(id+' input#telefone_titular').val();
-	var cpf_titular 		= jQuery(id+' input#cpf_titular').val();
+	var parcela_selecionada 	= jQuery(id+' input[name=parcelamento]:visible:checked').val();
+	var numero_cartao 			= jQuery(id+' input#card_number').val();
+	var validade_cartao 		= jQuery(id+' input#expiry_date').val();
+	var cvv_cartao 				= jQuery(id+' input#cvv').val();
+	var titular_cartao 			= jQuery(id+' input#name_on_card').val();
+	var nascimento_titular 		= jQuery(id+' input#nascimento_titular').val();
+	var telefone_titular 			= jQuery(id+' input#telefone_titular').val();
+	var cpf_titular 				= jQuery(id+' input#cpf_titular').val();
 
 	jQuery('#div_erro').show();
 	jQuery('#div_erro').addClass('error');
@@ -225,12 +224,22 @@ function submeter_cartao(formulario) {
 		jQuery('#div_erro_conteudo').text('Digite o código de verificação Cartão de Crédito');	
 		msgPop();
 		return erro_cartao();
-	}
+	}	
 	if (cartao_selecionado == '') {
 		jQuery('#div_erro_conteudo').text('Selecione um Cartão de Crédito');
 		msgPop();
 		return erro_cartao();
 	}
+	if (cartao_selecionado == 'amex' && cvv_cartao.length > 3) {
+		jQuery('#div_erro_conteudo').text('O Código de verificação deve ser de 4 dígitos.');
+		msgPop();
+		return erro_cartao();	
+	} else if(cvv_cartao.length != 3) {
+		jQuery('#div_erro_conteudo').text('O Código de verificação deve ser de 3 dígitos.');
+		msgPop();
+		return erro_cartao();	
+	}
+
 	if (parcela_selecionada == '') {
 		jQuery('#div_erro_conteudo').text('Selecione um parcelamento do Cartão de Crédito');
 		msgPop();
@@ -266,8 +275,9 @@ function submeter_cartao(formulario) {
 		}
 	}
 	jQuery('#forma_pagamento').val('CartaodeCredito');
-	jQuery('#tipo_pagamento').val(cartoes[cartao_selecionado]+' - '+parcela_selecionada+'x |'+titular_cartao+'|'+nascimento_titular+'|'+telefone_titular+'|'+cpf_titular);
-	
+	//jQuery('#tipo_pagamento').val(cartoes[cartao_selecionado]+' - '+parcela_selecionada+'x |'+titular_cartao+'|'+nascimento_titular+'|'+telefone_titular+'|'+cpf_titular);
+	jQuery('#tipo_pagamento').val(cartoes[cartao_selecionado]+' - '+parcela_selecionada+'x ');
+
 	MoipWidget(settings);
 	return false;
 }
@@ -295,7 +305,7 @@ function submeter_boleto(formulario) {
 		"Forma": "BoletoBancario"
 	}
 	jQuery('#forma_pagamento').val('BoletoBancario');
-	jQuery('#tipo_pagamento').val('Boleto Itaú');
+	jQuery('#tipo_pagamento').val('Boleto Bradesco');
 	
 	pagamentoEmAndamento();
 	
@@ -341,13 +351,20 @@ function notificaPagamento(data) {
 	if (status_pagamento == 'undefined') {
 		status_pagamento = '';
 	}
+	var mensagem_retorno_pagto;
+	if (typeof(data.Classificacao) != 'undefined') {
+		mensagem_retorno_pagto = '#'+data.Classificacao.Codigo+' - '+data.Classificacao.Descricao;
+	} else {
+		mensagem_retorno_pagto = 'Transação em Andamento';
+	}
 	var dados = 'CodigoMoIP='+data.CodigoMoIP+
 				'&Codigo='+data.Codigo+
 				'&Status='+data.Status+
 				'&StatusPagamento='+data.StatusPagamento+
 				'&TaxaMoip='+data.TaxaMoip+
 				'&TotalPago='+data.TotalPago+
-				'&Mensagem='+data.Mensagem+
+				'&Mensagem='+mensagem_retorno_pagto+
+				'&Url='+data.url+
 				'&order_id='+jQuery('#order_id').val()+
 				'&moip=1'+
 				'&TipoPagamento='+tipo_pagamento+
@@ -367,7 +384,14 @@ function notificaPagamento(data) {
 			if (!erro) {
 				if (data.Codigo == 0) {
 					jQuery('#div_erro').addClass('success').removeClass('error').show();
-					mensagem_pagamento = 'Forma de Pagamento: '+forma_pagamento+' - '+tipo_pagamento+' <br />';
+					// mensagem de retorno do pagamento
+					var mensagem_pagamento = '';
+					if (typeof (data.CodigoMoIP) != 'undefined') {
+						mensagem_pagamento += '<b>ID MOIP: #'+data.CodigoMoIP+'</b> <br />';						
+					}
+					mensagem_pagamento += 'Status: <b>'+mensagem_retorno_pagto+'</b> <br /><br />';
+
+					mensagem_pagamento += 'Forma de Pagamento: '+forma_pagamento+' - '+tipo_pagamento+' <br />';
 					if (forma_pagamento == 'CartaodeCredito' || forma_pagamento == 'CartaodeDebito') {
 						mensagem_pagamento +='Em alguns segundos você será redirecionado para o comprovante do Pagamento.';
 						jQuery('#div_erro_conteudo').show().html(data.Mensagem+'<br /><br />'+mensagem_pagamento);

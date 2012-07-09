@@ -14,7 +14,8 @@
 		&lt;img src=&quot;../plugins/vmpayment/moip/logo_moip.png&quot; /&gt;
 		&lt;/div&gt;
 		&lt;div&gt;&lt;em&gt;Passo 1&lt;/em&gt; - Crie sua conta Moip ( caso não exista ) e solicite a ativação da &lt;b&gt;API Moip&lt;/b&gt;. &lt;/div&gt;
-		&lt;div&gt;&lt;em&gt;Passo 2&lt;/em&gt; - Configure o retorno automático em &lt;b&gt;Menu Meus Dados / Notificação das Transações&lt;/b&gt;. &lt;br /&gt; A url tem que ser assim: &lt;b&gt;http://urldositecom.br//index.php?option=com_virtuemart&amp;view=pluginresponse&amp;task=plugin&amp;tmpl=component&amp;task=pluginresponsereceived&amp;pm=6&amp;nasp=1&lt;/b&gt; &lt;/div&gt;
+		&lt;div&gt;&lt;em&gt;Passo 2&lt;/em&gt; - Configure o retorno automático em &lt;b&gt;Menu Meus Dados / Notificação das Transações&lt;/b&gt;. &lt;br /&gt; A url tem que ser assim: &lt;b&gt;http://urldositecom.br/index.php?option=com_virtuemart&amp;view=pluginresponse&amp;task=plugin&amp;tmpl=component&amp;task=pluginresponsereceived&amp;nasp=1&lt;/b&gt; &lt;/div&gt;
+		&lt;div&gt;&lt;em&gt;Passo 2.1&lt;/em&gt; - Crie 2 campos extras no Virtuemart: "numero" e "bairro". O número da residência é obrigatório, assim como o bairro&lt;/div&gt;
 		&lt;div&gt;&lt;em&gt;Passo 3&lt;/em&gt; - Habilite o plugin aqui &lt;a href=&quot;index.php?option=com_plugins&amp;view=plugins&amp;filter_search=moip&quot;&gt;Administrar Plugins&lt;/a&gt;&lt;/div&gt;
 		&lt;div&gt;&lt;em&gt;Passo 4&lt;/em&gt; - Instale Plugin por esta tela &lt;a href=&quot;index.php?option=com_virtuemart&amp;view=paymentmethod&quot;&gt;Métodos de pagamento&lt;/a&gt;&lt;/div&gt;
 		&lt;div&gt;&lt;em&gt;Passo 4.1&lt;/em&gt; - &lt;b&gt;Clique em Novo Método de Pagamento&lt;/b&gt; e preencha as informações:&lt;/div&gt;
@@ -58,7 +59,7 @@
 		&lt;div&gt;* Débito Banrisul &lt;b&gt; (Sim ou Nâo) &lt;/b&gt;&lt;/div&gt;		
 		&lt;div&gt;* Débito Itaú &lt;b&gt; (Sim ou Nâo) &lt;/b&gt;&lt;/div&gt;		
 		&lt;div&gt; &lt;br /&gt;Pagamento com Boleto Aceitos &lt;/div&gt;		
-		&lt;div&gt;* Boleto Itaú &lt;b&gt; (Sim ou Nâo) &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;* Boleto Bradesco &lt;b&gt; (Sim ou Nâo) &lt;/b&gt;&lt;/div&gt;		
 		&lt;div&gt; &lt;br /&gt;Outras configurações&lt;/div&gt;		
 		&lt;div&gt;* Países &lt;b&gt; (Brasil) &lt;/b&gt;&lt;/div&gt;		
 		&lt;div&gt;* Mínimo da Compra &lt;b&gt; (Mínimo da compra para ativar o módulo) &lt;/b&gt;&lt;/div&gt;		
@@ -71,20 +72,26 @@
 	&lt;div&gt;	Licença: &lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GNU/GPL v3&lt;/a&gt; - Desenvolvido por Luiz Weber - &lt;a href=&quot;http://weber.eti.br&quot;&gt;Weber TI&lt;/a&gt; | &lt;a href=&quot;http://webgenium.com.br&quot;&gt;Webgenium System&lt;/a&gt;
 	
 	</description>
-    <files>
-        <filename plugin="moip">moip.php</filename>
-        <filename>licenca-gplv3.txt</filename>
-        <filename>leiame.txt</filename>
-        <filename>gplv3-license.txt</filename>
-        <filename>logo_moip.png</filename>
+	<files>
+		<filename plugin="moip">moip.php</filename>
+		<filename>licenca-gplv3.txt</filename>
+		<filename>leiame.txt</filename>
+		<filename>gplv3-license.txt</filename>
+		<filename>logo_moip.png</filename>
 		<folder>assets</folder>
 		<folder>imagens</folder>
-    </files>
-	<languages>
-	<language tag="pt-BR">pt-BR.plg_vmpayment_moip.ini</language>
-	<language tag="en-GB">en-GB.plg_vmpayment_moip.ini</language>
-    </languages>
-	
+		<folder>language</folder>
+	</files>		
+    <administration>
+	<languages folder="language">
+		<language tag="pt-BR">pt-BR.plg_vmpayment_moip.ini</language>
+		<language tag="en-GB">en-GB.plg_vmpayment_moip.ini</language>
+	</languages>
+    </administration>
+	<languages folder="language">
+		<language tag="pt-BR">pt-BR.plg_vmpayment_moip.ini</language>
+		<language tag="en-GB">en-GB.plg_vmpayment_moip.ini</language>
+	</languages>
     <params addpath="/administrator/components/com_virtuemart/elements">
         <param type="vmjpluginwarning" />
         <param	name="payment_logos" type="vmfiles" label="VMPAYMENT_STANDARD_LOGOS"
@@ -179,11 +186,10 @@
         </param>
 		
 		<param type="spacer" default="Pagamento com Boleto Aceitos" />
-		<param name="boleto_itau" type="list" default="1" label="Boleto Itaú">
-            <option value="0">COM_VIRTUEMART_NO</option>            
-            <option value="1">COM_VIRTUEMART_YES</option>
-        </param>
-		
+		<param name="boleto_bradesco" type="list" default="1" label="Boleto Bradesco">
+			<option value="0">COM_VIRTUEMART_NO</option>            
+			<option value="1">COM_VIRTUEMART_YES</option>
+		</param>		
 		
 		<param type="spacer" default="Extras" />		
 		<param name="countries" type="vmcountries"  scope="com_virtuemart" default="" label="Países" description="Países para validar este pagamento"/>
@@ -194,6 +200,6 @@
 		<param name="tax_id" type="vmtaxes" scope="com_virtuemart"  label="Tarifa/Imposto" description="Imposto ou tarifa aplicada" />
 		
 		
-	<param type="spacer" default="Licença: &lt;a href='http://www.gnu.org/licenses/gpl-3.0.html'&gt;GNU/GPL v3&lt;/a&gt; - Desenvolvido por Luiz Weber - &lt;a href='http://weber.eti.br'&gt;Weber TI&lt;/a&gt; | &lt;a href='http://webgenium.com.br'&gt;Webgenium System&lt;/a&gt;" />
+		<param type="spacer" default="Licença: &lt;a href='http://www.gnu.org/licenses/gpl-3.0.html'&gt;GNU/GPL v3&lt;/a&gt; - Desenvolvido por Luiz Weber - &lt;a href='http://weber.eti.br'&gt;Weber TI&lt;/a&gt; | &lt;a href='http://webgenium.com.br'&gt;Webgenium System&lt;/a&gt;" />
     </params>
 </install>

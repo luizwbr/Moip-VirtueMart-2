@@ -36,8 +36,8 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
         $this->_loggable = true;
         $this->tableFields = array_keys($this->getTableSQLFields());
-		$this->_tablepkey = 'id'; //virtuemart_paypal_id';
-		$this->_tableId = 'id'; //'virtuemart_paypal_id';
+		$this->_tablepkey = 'id'; 
+		$this->_tableId = 'id'; 
         $varsToPush = array('payment_logos' => array('', 'char'),
             'modo_teste' => array('', 'int'),
             'token_teste' => array('', 'string'),
@@ -207,7 +207,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		$dbValues['payment_name'] 					= $this->renderPluginName($method);
 		
         $html = '<table>' . "\n";
-        $html .= $this->getHtmlRowBE('MOIP', $dbValues['payment_name']);
+        $html .= $this->getHtmlRowBE('MOIP_PAYMENT_NAME', $dbValues['payment_name']);
         if (!empty($payment_info)) {
             $lang = & JFactory::getLanguage();
             if ($lang->hasKey($method->payment_info)) {
@@ -215,7 +215,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
             } else {
                 $payment_info = $method->payment_info;
             }
-            $html .= $this->getHtmlRowBE('VMPAYMENT_MOIP_INFO', $payment_info);
+            $html .= $this->getHtmlRowBE('MOIP_INFO', $payment_info);
         }
         if (!class_exists('VirtueMartModelCurrency')) {
             require(JPATH_VM_ADMINISTRATOR . DS . 'models' . DS . 'currency.php');
@@ -1093,8 +1093,8 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			require(JPATH_VM_SITE . DS . 'helpers' . DS . 'shopfunctionsf.php');
 		if (!class_exists('VirtueMartModelOrders'))
 			require( JPATH_VM_ADMINISTRATOR . DS . 'models' . DS . 'orders.php' );
-		$paypal_data = JRequest::get('post');
-		vmdebug('PAYPAL plgVmOnPaymentResponseReceived', $paypal_data);
+		$moip_data = JRequest::get('post');
+		vmdebug('MOIP plgVmOnPaymentResponseReceived', $moip_data);
 		// the payment itself should send the parameter needed.
 		$virtuemart_paymentmethod_id = JRequest::getInt('pm', 0);
 		
@@ -1191,7 +1191,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
 	function _getPaymentResponseHtml($moipTable, $payment_name, $orderDetails=null, $method=null) {
 		$html = '<table>' . "\n";
-		$html .= $this->getHtmlRowBE('PAYPAL_PAYMENT_NAME', $payment_name);
+		$html .= $this->getHtmlRowBE('MOIP_PAYMENT_NAME', $payment_name);
 		$task = JRequest::getVar('task','');
 		$img_pagamentos = array();
 		$img_pagamentos['BoletoBancario - Boleto Bradesco'] = 'bradesco_boleto.jpg';
@@ -1256,7 +1256,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 				' . "\n";
 			}
 		} else {
-			$html .= $this->getHtmlRowBE('PAYPAL_ORDER_NUMBER', $this->order_id);			
+			$html .= $this->getHtmlRowBE('MOIP_ORDER_NUMBER', $this->order_id);			
 		}		
 		$html .= '</table>' . "\n";
 

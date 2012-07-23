@@ -390,13 +390,13 @@ function notificaPagamento(data) {
 						mensagem_pagamento += '<b>ID MOIP: #'+data.CodigoMoIP+'</b> <br />';						
 					}
 					mensagem_pagamento += 'Status: <b>'+mensagem_retorno_pagto+'</b> <br /><br />';
-
 					mensagem_pagamento += 'Forma de Pagamento: '+forma_pagamento+' - '+tipo_pagamento+' <br />';
+
 					if (forma_pagamento == 'CartaodeCredito' || forma_pagamento == 'CartaodeDebito') {
-						mensagem_pagamento +='Em alguns segundos você será redirecionado para o comprovante do Pagamento.';
+						mensagem_pagamento +='Em alguns segundos você será redirecionado automaticamente  para o comprovante do Pagamento ou <a href="'+url_recibo_moip+'">clique aqui</a>.';
 						jQuery('#div_erro_conteudo').show().html(data.Mensagem+'<br /><br />'+mensagem_pagamento);
 						msgPop();												
-						var t = setTimeout('redireciona_recibo()',3000);
+						var t = setTimeout('redireciona_recibo()',5000);
 					} else {						
 						mensagem_pagamento += 'Clique no <a href="'+url_recibo_moip+'">link</a> para acessar os detalhes do pedido.';
 						jQuery('#div_erro_conteudo').show().html(data.Mensagem+'<br /><br />'+mensagem_pagamento);
@@ -417,7 +417,14 @@ function notificaPagamento(data) {
 					} else {
 						mensagem = data.Mensagem;
 					}
-					jQuery('#div_erro_conteudo').show().html(mensagem+'<br />');
+					
+					if (mensagem == 'Pagamento já foi realizado') {
+						mensagem +='<br/> <a href="'+url_recibo_moip+'">Clique aqui para ser redirecionado</a> para o status do Pagamento.';
+						jQuery('#container form').parent().hide('slow');
+					}
+					
+					jQuery('#div_erro_conteudo').show().html(mensagem+'<br />');					
+					jQuery('#div_erro_conteudo').animate({"padding":"20px","font-size":"15px"}, 1000);
 					
 					SqueezeBox.open($('system-message-cartao').clone().addClass('error').set('id','system-message-cartao'), {
 						handler: 'adopt',

@@ -230,11 +230,12 @@ function submeter_cartao(formulario) {
 		msgPop();
 		return erro_cartao();
 	}
-	if (cartao_selecionado == 'amex' && cvv_cartao.length > 3) {
+	if (cartao_selecionado == 'amex' && cvv_cartao.length != 4) {
 		jQuery('#div_erro_conteudo').text('O Código de verificação deve ser de 4 dígitos.');
 		msgPop();
 		return erro_cartao();	
-	} else if(cvv_cartao.length != 3) {
+	} 
+	if(cartao_selecionado != 'amex' && cvv_cartao.length != 3) {
 		jQuery('#div_erro_conteudo').text('O Código de verificação deve ser de 3 dígitos.');
 		msgPop();
 		return erro_cartao();	

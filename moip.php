@@ -75,6 +75,9 @@ class plgVmPaymentMoip extends vmPSPlugin {
             'debito_banrisul'=> array('', 'string'),
             'debito_itau'=> array('', 'string'),
             'boleto_bradesco'=> array('', 'string'),	
+            'campo_bairro'=> array('', 'string'),	
+            'campo_numero'=> array('', 'string'),	
+            'campo_complemento'=> array('', 'string'),	
         );
         $this->setConfigParameterable($this->_configTableFieldName, $varsToPush);
 
@@ -250,7 +253,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
         $dbValues['cost_percent_total'] 				= $method->cost_percent_total;
         $dbValues['payment_currency'] 				= $currency_code_3;
         $dbValues['payment_order_total'] 			= $totalInPaymentCurrency;
-        $dbValues['tax_id'] 									= $method->tax_id;
+        $dbValues['tax_id'] 								= $method->tax_id;
         $dbValues['token_api'] 							= (string)$arr_pagamento['token'];
 		$this->storePSPluginInternalData($dbValues);
 		
@@ -527,8 +530,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 	// grava os dados do retorno da Transação
 	public function gravaDadosRetorno($method, $status=0, $msg_status='', $status_pagamento="") {
 		
-		$this->timestamp = date('Y-m-d').'T'.date('H:i:s');
-		
+		$this->timestamp = date('Y-m-d').'T'.date('H:i:s');		
 		// recupera as informações do pagamento
 		$db = JFactory::getDBO();
 		$query = 'SELECT payment_name, payment_order_total, payment_currency, virtuemart_paymentmethod_id
@@ -546,19 +548,26 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
 		$log = $this->timestamp.'|'.$this->codigo_moip.'|'.$msg_status.'|'.$tipo_pagamento.'|'.$forma_pagamento.'|'.$pagamento[0]->payment_order_total;
 		
+		if (!($virtuemart_order_id = VirtueMartModelOrders::getOrderIdByOrderNumber ($this->order_id))) {
+			return NULL;
+		}
+
 		$response_fields = array();
-		$response_fields['codigo_moip'] 			= $this->codigo_moip;
-		$response_fields['cofre']				 			= $cofre;
+		$response_fields['virtuemart_order_id'] 	= $virtuemart_order_id;
+		$response_fields['codigo_moip'] 				= $this->codigo_moip;
+		$response_fields['cofre']				 		= $cofre;
 		$response_fields['type_transaction']		= $forma_pagamento;
 		$response_fields['log'] 							= $log;
 		$response_fields['status'] 						= $status_pagamento;
 		$response_fields['msg_status'] 				= $msg_status;
 		$response_fields['order_number'] 			= $this->order_id;
+		
 		$response_fields['payment_name'] 							= $pagamento[0]->payment_name;
 		$response_fields['payment_currency'] 						= $pagamento[0]->payment_currency;
 		$response_fields['payment_order_total'] 					= $pagamento[0]->payment_order_total;
 		$response_fields['virtuemart_paymentmethod_id'] 	= $pagamento[0]->virtuemart_paymentmethod_id;
-		$this->storePSPluginInternalData($response_fields, 'order_number', 'true');
+		
+		$this->storePSPluginInternalData($response_fields, 'virtuemart_order_id', true);
 	}
 	
 	
@@ -751,76 +760,21 @@ class plgVmPaymentMoip extends vmPSPlugin {
      * @author Valerie Isaksen
      */
     public function plgVmOnShowOrderFEPayment($virtuemart_order_id, $virtuemart_paymentmethod_id, &$payment_name) {
-		/*
-		$orderModel = VmModel::getModel('orders');
-		$orderDetails = $orderModel->getOrder($virtuemart_order_id);
 
-		if (!($method = $this->getVmPluginMethod($orderDetails['details']['BT']->virtuemart_paymentmethod_id))) {
-			return false;
+		$view = JRequest::getVar('view');
+		if ($view=='orders') {
+			$orderModel 	= VmModel::getModel('orders');
+			$orderDetails 	= $orderModel->getOrder($virtuemart_order_id);
+			$order_id 		= $orderDetails['details']['BT']->order_number;
+			$virtuemart_paymentmethod_id = $orderDetails['details']['BT']->virtuemart_paymentmethod_id;
+		
+			JHTML::_('behavior.modal');	
+			$url_recibo = JRoute::_('index.php?option=com_virtuemart&view=pluginresponse&tmpl=component&task=pluginresponsereceived&on='.$order_id.'&pm='.$virtuemart_paymentmethod_id);
+			$html = '<br /><b><a href="'.$url_recibo.'" class="modal" rel="{size: {x: 700, y: 500}, handler:\'iframe\'}" >Clique aqui para visualizar o status detalhado da transação no MoIP</a></b> <br /><br />';
+			JFactory::getApplication()->enqueueMessage(
+				$html, 'alert'
+			);
 		}
-
-		// somente para os pedidos não finalizados		
-		if ($method->transacao_nao_finalizada == $orderDetails['details']['BT']->order_status) {
-			$this->order_id = $orderDetails['details']['BT']->order_number;
-		
-			$url 	= JURI::root();
-			// carrega os js e css
-			$doc = & JFactory::getDocument();
-			$url_lib 			= $url. DS .'plugins'. DS .'vmpayment'. DS .'moip'.DS;
-			$url_js 			= $url_lib . 'assets'. DS. 'js'. DS;
-			$this->url_imagens 	= $url_lib . 'imagens'. DS;
-			$url_css 			= $url_lib . 'assets'. DS. 'css'. DS;
-			// redirecionar dentro do componente para validar
-			$url_redireciona_moip = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=pluginresponse&task=pluginnotification&tmpl=component&pm='.$order['details']['BT']->virtuemart_paymentmethod_id);
-			$url_pedidos = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=orders');
-			$doc->addCustomTag('
-				<script language="javascript">
-					jQuery.noConflict();
-					var redireciona_moip = "'.$url_redireciona_moip.'";
-					var url_pedidos = "'.$url_pedidos.'";
-				</script>
-				<script type="text/javascript" language="javascript" src="'.$url_js.'jquery.mask.js"></script>
-				<script type="text/javascript" language="javascript" src="'.$url_js.'moip.js"></script>
-				<script type="text/javascript" language="javascript" src="'.$url_js.'jquery.card.js"></script>
-				<script type="text/javascript" language="javascript" src="'.$url_js.'validar_cartao.js"></script>
-				<link href="'.$url_css.'css_pagamento.css" rel="stylesheet" type="text/css"/>
-				<link href="'.$url_css.'card.css" rel="stylesheet" type="text/css"/>
-			');
-			
-			$html = '<input type="hidden" name="order_id" id="order_id" value="'. $this->order_id .'"/>';
-			
-			$this->chave_moip = $this->getChaveMoip($method);
-			$this->token_moip = $this->getAfiliacaoMoip($method);
-			
-			if ($method->modo_teste) {
-				// url do ambiente de desenvolvimento
-				$this->setaUrlRequest('https://desenvolvedor.moip.com.br/sandbox/ws/alpha/EnviarInstrucao/Unica');
-				$this->setaUrlJs('https://desenvolvedor.moip.com.br/sandbox/transparente/MoipWidget-v2.js');
-			} else {
-				// url do ambiente de produção
-				$this->setaUrlRequest('https://www.moip.com.br/ws/alpha/EnviarInstrucao/Unica');
-				$this->setaUrlJs('https://www.moip.com.br/transparente/MoipWidget-v2.js');
-			}	
-			
-			$db = JFactory::getDBO();
-			$query = 'SELECT token_api
-							FROM `' . $this->_tablename . '`
-							WHERE order_number = "'.$this->order_id.'"';
-			$db->setQuery($query);
-			$token_api = $db->loadObjectList();
-		
-			$this->token_api  	= $token_api[0]->token_api;
-			// monta o formulário
-			$html .= $this->Moip_mostraParcelamento($method, $orderDetails);				
-			JFactory::getApplication()->enqueueMessage(utf8_encode(
-				JText::_('VMPAYMENT_MOIP_TRANSACTION_PENDING')
-			));
-			echo $html;
-			
-			
-		
-		}
-		*/
         $this->onShowOrderFE($virtuemart_order_id, $virtuemart_paymentmethod_id, $payment_name);
     }
 
@@ -1011,19 +965,24 @@ class plgVmPaymentMoip extends vmPSPlugin {
 	
 			$response_fields['payment_currency'] 						= $pagamento[0]->payment_currency;
 			$response_fields['payment_order_total'] 					= $pagamento[0]->payment_order_total;
-			$response_fields['virtuemart_paymentmethod_id'] 		= $pagamento[0]->virtuemart_paymentmethod_id;
+			//$response_fields['virtuemart_paymentmethod_id'] 		= $pagamento[0]->virtuemart_paymentmethod_id;
 			
 			$response_fields['status'] 							= $novo_status;
 			$response_fields['msg_status']					= $arr_status[$status];
 			$response_fields['virtuemart_paymentmethod_id'] = $pm;
 			$response_fields['payment_name'] 				= $payment->payment_name;
 			$response_fields['order_number'] 				= $order_number;
-			$response_fields['codigo_moip'] 					= $codigo_moip;
 			$response_fields['virtuemart_order_id'] 		= $virtuemart_order_id;
 			$response_fields['type_transaction'] 			= $forma_pagamento.' - '.$tipo_pagamento;
-			$response_fields['url_redirecionar'] 				= $url_redirecionar;
 			$response_fields['log'] 								= $log;
-			$this->storePSPluginInternalData($response_fields, 'order_number', 'true');
+
+			if (!empty($codigo_moip) ) {
+				$response_fields['codigo_moip'] 					= $codigo_moip;			
+			}
+			if (!empty($url_redirecionar) ) {
+				$response_fields['url_redirecionar'] 				= $url_redirecionar;
+			}
+			$this->storePSPluginInternalData($response_fields, 'virtuemart_order_id', true);
 
 			// notificação do pagamento realizado
 			$notificacao = "<b>".JText::_('VMPAYMENT_MOIP_NOTIFY_TRANSACTION')." - ".$forma_pagamento."</b>\n";
@@ -1217,12 +1176,12 @@ class plgVmPaymentMoip extends vmPSPlugin {
 				if ($moipTable->msg_status) {
 					$moip_status = '<b>'.$moipTable->status. " - " . $moipTable->msg_status.'</b><br />';
 				} else {					
-					$moip_status = 'Transação em Andamento';
+					$moip_status = '<b>Transação em Andamento</b>';
 					if ($orderDetails['BT']->order_status == $method->transacao_nao_finalizada and !$moipTable->codigo_moip) {
 						$url_imagem = JURI::root().DS.'plugins'.DS.'vmpayment'.DS.'moip'.DS.'imagens'.DS;
 						$url_imagem .= $img_pagamentos[$moipTable->type_transaction];
 						$imagem_redirecionar = '<img src="'.$url_imagem.'" border="0"/>';
-						$moip_status = '<div style="padding: 10px"><br />Faça o pagamento clicando aqui: <br /><a target="blank" href="'.$moipTable->url_redirecionar.'">'.$imagem_redirecionar.'</a><br /><br /></div>';
+						$moip_status .= '<div style="padding: 10px"><br />Faça o pagamento clicando aqui: <br /><a target="blank" href="'.$moipTable->url_redirecionar.'">'.$imagem_redirecionar.'</a><br /><br /></div>';
 					}
 				}
 
@@ -1251,9 +1210,12 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
 				$html .= $this->getHtmlRowBE('MOIP_LOG', $moipTable->log);
 				$html .= '</table>' . "\n";
-				$html .= '<br />
-				<a href="'.$link_pedido.'" class="button">'.JText::_('VMPAYMENT_MOIP_ORDER_DETAILS').'</a>
-				' . "\n";
+				$html .= '<br />';
+				$tmpl = JRequest::getVar('tmpl');
+				if ($tmpl != 'component') {
+					$html .= '<a href="'.$link_pedido.'" class="button">'.JText::_('VMPAYMENT_MOIP_ORDER_DETAILS').'</a>
+					' . "\n";
+				}
 			}
 		} else {
 			$html .= $this->getHtmlRowBE('MOIP_ORDER_NUMBER', $this->order_id);			
@@ -1341,16 +1303,21 @@ class plgVmPaymentMoip extends vmPSPlugin {
 	* Xml Consulta inicial
 	**/
     function getXmlConsulta($method, $order) {
-
+	
+		// configuração de campos extras
+		$campo_bairro = $method->campo_bairro;
+		$campo_numero = $method->campo_numero;
+		$campo_complemento = $method->campo_complemento;
+		
 		$order_total = round($order['details']["BT"]->order_total,2);
 		$order_number = $order['details']["BT"]->order_number;
 		$customer_name = $order["details"]["BT"]->first_name .' '. $order["details"]["BT"]->last_name;
 		$order_email = $order["details"]["BT"]->email;
 		$customer_number = $order["details"]["BT"]->virtuemart_user_id;
-		$customer_address = $order["details"]["BT"]->address_1;
-		$customer_address_number = $order["details"]["BT"]->numero;
+		$customer_address = $order["details"]["BT"]->$campo_complemento;
+		$customer_address_number = $order["details"]["BT"]->$campo_numero;
 		$customer_address_complemento = $order["details"]["BT"]->address_2;
-		$customer_bairro = $order["details"]["BT"]->bairro;
+		$customer_bairro = $order["details"]["BT"]->$campo_bairro;
 		$customer_city = $order["details"]["BT"]->city;
 		$customer_state = ShopFunctions::getStateByID($order["details"]["BT"]->virtuemart_state_id, "state_2_code");	
 

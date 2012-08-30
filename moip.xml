@@ -117,6 +117,11 @@
         <param name="valor_minimo" type="text" size="10"  label="Valor mínimo" description="Valor mínimo para compras na loja." default="0.01"/> 		
         <param name="mensagem_pagamento" type="text" size="30"  label="Mensagem Pagamento" description="Mensagem que aparece no ambiente do Moip: Pagamento para a loja X." default="Pagamento para a loja X"/> 		
 		
+		<param type="spacer" default="Campos Extras Obrigatorios no Formulário de Registro" />
+        <param name="campo_bairro" type="text" size="30"  label="Campo Bairro" description="Nome do campo Bairro" default="bairro"/> 		
+        <param name="campo_numero" type="text" size="30"  label="Campo Número ( do endereço )" description="Nome do campo Número do Endereço do usuário" default="numero"/> 		
+        <param name="campo_complemento" type="text" size="30"  label="Campo Complemento ( do endereço )" description="Nome do campo Complemento do Endereço" default="address_2"/> 		
+		
         <param type="spacer" default="Status postado pela Moip" />
         <param name="transacao_concluida" type="vmorderstate" default="C" label="Aprovado" description="Status aprovado dentro do seu Virtuemart" />
         <param name="transacao_em_analise" type="vmorderstate" label="Em Análise" description="Status em Análise pelo sistema do Moip" />

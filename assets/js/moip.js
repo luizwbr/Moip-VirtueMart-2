@@ -5,7 +5,6 @@ var retorno;
 var mpg_popup;
 window.name="loja";
 function fabrewin(jan) {
-
     if(navigator.appName.indexOf("Netscape") != -1) {
        mpg_popup = window.open("", "mpg_popup","toolbar=0,location=0,directories=0,status=1,menubar=0,scrollbars=1,resizable=0,screenX=0,screenY=0,left=0,top=0,width=800,height=600");
      }
@@ -102,9 +101,7 @@ function arredondamento (x, n){
 	return (Math.round (y)/pow10).toFixed(2);
 }
 
-
 function show_parcelas(item) {
-
 	var id		= '';
 	var debito  = new Array('visa_electron','maestro');
 	var credito = new Array('visa','master','diners','elo','amex','discover','hipercard');
@@ -162,7 +159,8 @@ function marcar_radio(id) {
 
 jQuery(document).ready(function(){
 	jQuery('#cvv').mask("999?9");  
-	jQuery('#telefone_titular').mask("(99) 9999-9999");  
+	// adicionando compatibilidade com telefones do prefixo 11 com um dígito a mais
+	jQuery('#telefone_titular').mask("(99) 9999?9-9999");  
 	jQuery('#cpf_titular').mask("999.999.999-99");
 	jQuery('#expiry_date').mask("99/99");	 
 	jQuery('#nascimento_titular').mask("99/99/9999");	 
@@ -293,7 +291,7 @@ function msgPop() {
 
 function pagamentoEmAndamento() {
 	jQuery('#div_erro').removeClass('error');
-	jQuery('#div_erro_conteudo').html('<div align="center">Pagamento em Andamento...<br /><br /><img src="plugins/vmpayment/moip/assets/images/carregando.gif" border="0"/></div>');
+	jQuery('#div_erro_conteudo').html('<div align="center">Pagamento em Andamento...<br /><br /><img src="/plugins/vmpayment/moip/assets/images/carregando.gif" border="0"/></div>');
 	msgPop();
 }
 
@@ -375,12 +373,12 @@ function notificaPagamento(data) {
 		type: "POST",
 		url: redireciona_moip,	
 		data: dados,
-		success: function(retorno){
+		success: function(retorno){	
 			var debito = jQuery('input[name=tipo_pgto_debito]:visible:checked').length;
 			var boleto = jQuery('form#pagamento_boleto:visible').length;
-			if ((debito > 0 || boleto > 0) && data.Codigo == 0) {
+			if ((debito > 0 || boleto > 0) && data.Codigo == 0) {			
 				SqueezeBox.initialize();
-				SqueezeBox.open(data.url, {handler: 'iframe', size: {x:750, y:500}});				
+				SqueezeBox.open(data.url, {handler: 'iframe', size: {x:750, y:500}});
 			}
 			if (!erro) {
 				if (data.Codigo == 0) {

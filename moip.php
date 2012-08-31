@@ -356,7 +356,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			</li>
 		</ul>
 		<br style="clear:both"/>
-		<input type="submit" class="button" value="'.JText::_('VMPAYMENT_MOIP_TRANSACTION_BUTTON_BOLETO').'" />			
+		<input type="submit" class="buttonMoIP" value="'.JText::_('VMPAYMENT_MOIP_TRANSACTION_BUTTON_BOLETO').'" />			
 		</form>
 		</div>
 		<br style="clear:both"/>';
@@ -449,7 +449,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 					</li>
 				</ul>
 				<br style='clear:both'/>
-				<input type='submit' class='button' value='".JText::_('VMPAYMENT_MOIP_TRANSACTION_BUTTON')."'  />		
+				<input type='submit' class='buttonMoIP' value='".JText::_('VMPAYMENT_MOIP_TRANSACTION_BUTTON')."'  />		
 			</form>
 			</div>
 			<br style='clear:both'/>
@@ -485,7 +485,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 				</li>
 			</ul>
 			<br style='clear:both'/>
-			<input type='submit' class='button' value='".JText::_('VMPAYMENT_MOIP_TRANSACTION_BUTTON')."'  />	
+			<input type='submit' class='buttonMoIP' value='".JText::_('VMPAYMENT_MOIP_TRANSACTION_BUTTON')."'  />	
 			</form>
 			</div>
 			<br style='clear:both'/>";
@@ -1333,7 +1333,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
 		$this->xml_consulta = '<EnviarInstrucao>
 				  <InstrucaoUnica TipoValidacao="Transparente">
-						<Razao>'.$method->mensagem_pagamento.($order_number).'</Razao>
+						<Razao>'.$method->mensagem_pagamento.' - '.($order_number).'</Razao>
 						<Valores>
 							<Valor moeda="BRL">'.$order_total.'</Valor>
 						</Valores>

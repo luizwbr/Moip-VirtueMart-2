@@ -7,7 +7,7 @@ Passo 1 - Crie sua conta Moip ( caso não exista ) e solicite a ativação da API M
 Passo 2 - Configure o retorno automático em Menu Meus Dados / Notificação das Transações. 
 A url tem que ser assim: http://urldositecom.br//index.php?option=com_virtuemart&view=pluginresponse&task=plugin&tmpl=component&task=pluginresponsereceived&pm=6&nasp=1
 
-Passo 2.1 - Crie 2 campos extras no Virtuemart: "numero" e "bairro". O número da residência é obrigatório, assim como o bairro
+Passo 2.1 - Configure os 3 campos extras: "numero", "bairro" e "complemento". Caso o campo não exista, ele deve ser criado.
 
 Passo 3 - Habilite o plugin aqui Administrar Plugins
 Passo 4 - Instale Plugin por esta tela Métodos de pagamento

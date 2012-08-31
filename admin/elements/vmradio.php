@@ -24,13 +24,13 @@ class JElementVMRadio extends JElement {
      */
     var $_name = 'Radio';
 
-    function fetchElement($name, $value, &$node, $control_name) {
+    function fetchElement($name, $value, &$node, $control_name) {	
+	
 		$html = array();
 		// Initialize some field attributes.
-		$class = $node->element['class'] ? ' class="radio ' . (string) $node->element['class'] . '"' : ' class="radio"';
+		//$class = $node->element['class'] ? ' class="radio ' . (string) $node->element['class'] . '"' : ' class="radio"';
 		// Start the radio field output.		
 		//$html[] = '<fieldset id="' . $this->id . '"' . $class . '>';
-
 		// Initialize variables.
 		$options = array();
 		foreach ($node->option as $option) {
@@ -64,7 +64,7 @@ class JElementVMRadio extends JElement {
 			} else {
 				$checked = '';
 			}
-			$class = !empty($option->class) ? ' class="' . $option->class . '"' : '';
+			$class = !empty($option->class) ? ' class="' . $option->class . ' '.$node->_attributes['class'].'"' : '';
 			$disabled = !empty($option->disable) ? ' disabled="disabled"' : '';
 
 			// Initialize some JavaScript option attributes.

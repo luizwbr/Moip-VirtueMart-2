@@ -1,10 +1,11 @@
 <?php
 defined('_JEXEC') or die();
+
 /**
  *
  * @package	VirtueMart
  * @subpackage Plugins  - Elements
- * @author Valérie Isaksen
+ * @author ValÃ©rie Isaksen
  * @link http://www.virtuemart.net
  * @copyright Copyright (c) 2004 - 2011 VirtueMart Team. All rights reserved.
  * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -14,21 +15,24 @@ defined('_JEXEC') or die();
  * other free or open source software licenses.
  * @version $Id: $
  */
- 
-class JElementVMAsset extends JElement {
-/**
+/*
+ * This class is used by VirtueMart Payment or Shipment Plugins
+ * which uses JParameter
+ * So It should be an extension of JElement
+ * Those plugins cannot be configured througth the Plugin Manager anyway.
+ */
+class JElementVmSpacer extends JElement {
+
+    /**
      * Element name
-     *
      * @access	protected
      * @var		string
      */
-    var $_name = 'Asset';
+    var $_name = 'Spacer';
 
     function fetchElement($name, $value, &$node, $control_name) {
-        $doc = JFactory::getDocument();
-        $doc->addScript(JURI::root().$node->attributes('path').'script.js');
-        $doc->addStyleSheet(JURI::root().$node->attributes('path').'style.css');
-        return null;
+		$html = "<h3>".$value."</h3>";
+		return $html;
     }
+
 }
-/* eof */

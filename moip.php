@@ -4,7 +4,7 @@ if (!defined('_VALID_MOS') && !defined('_JEXEC'))
     die('Direct Access to ' . basename(__FILE__) . ' is not allowed.');
 
 /**
- * @version $Id: moip.php,v 1.4 2005/05/27 19:33:57 ei
+ * @version $Id: moip.php,v 1.6 2012/08/31 11:00:57 ei
  *
  * a special type of 'cash on delivey':
  * @author Max Milbers, Valérie Isaksen, Luiz Weber
@@ -78,6 +78,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
             'campo_bairro'=> array('', 'string'),	
             'campo_numero'=> array('', 'string'),	
             'campo_complemento'=> array('', 'string'),	
+            'campo_logradouro'=> array('', 'string'),	
         );
         $this->setConfigParameterable($this->_configTableFieldName, $varsToPush);
 
@@ -568,7 +569,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		$response_fields['virtuemart_paymentmethod_id'] 	= $pagamento[0]->virtuemart_paymentmethod_id;
 		
 		$this->storePSPluginInternalData($response_fields, 'virtuemart_order_id', true);
-	}
+		}
 	
 	
 	function plgVmgetPaymentCurrency($virtuemart_paymentmethod_id, &$paymentCurrencyId) {
@@ -603,18 +604,25 @@ class plgVmPaymentMoip extends vmPSPlugin {
         $this->getPaymentCurrency($paymentTable);
 
         $html = '<table class="adminlist">' . "\n";
-        $html .=$this->getHtmlHeaderBE();
-        $html .= $this->getHtmlRowBE('MOIP_PAYMENT', $paymentTable->payment_name);
+        $html .=$this->getHtmlHeaderBE();	
+		
+        $html .= $this->getHtmlRowBE('MOIP_PAYMENT_NAME', 'MoIP');
 		$html .= $this->getHtmlRowBE('MOIP_PAYMENT_DATE', $paymentTable->modified_on);
         $html .= $this->getHtmlRowBE('MOIP_CODIGO_MOIP', $paymentTable->codigo_moip);
         $html .= $this->getHtmlRowBE('MOIP_STATUS', $paymentTable->status . ' - ' . $paymentTable->msg_status);
-        $html .= $this->getHtmlRowBE('MOIP_COFRE', $paymentTable->cofre);
+		if (!empty($paymentTable->cofre))
+			$html .= $this->getHtmlRowBE('MOIP_COFRE', $paymentTable->cofre);
         $html .= $this->getHtmlRowBE('MOIP_TOTAL_CURRENCY', $paymentTable->payment_order_total . ' ' . $paymentTable->payment_currency);
 		$html .= $this->getHtmlRowBE('MOIP_TYPE_TRANSACTION', $paymentTable->type_transaction);
-		$html .= $this->getHtmlRowBE('MOIP_NOME_TITULAR_CARTAO', $paymentTable->nome_titular_cartao);
-		$html .= $this->getHtmlRowBE('MOIP_NASCIMENTO_TITULAR_CARTAO', $paymentTable->nascimento_titular_cartao);
-		$html .= $this->getHtmlRowBE('MOIP_TELEFONE_TITULAR_CARTAO', $paymentTable->telefone_titular_cartao);
-		$html .= $this->getHtmlRowBE('MOIP_CPF_TITULAR_CARTAO', $paymentTable->cpf_titular_cartao);
+
+		if (!empty($paymentTable->nome_titular_cartao))
+			$html .= $this->getHtmlRowBE('MOIP_NOME_TITULAR_CARTAO', $paymentTable->nome_titular_cartao);
+		if (!empty($paymentTable->nascimento_titular_cartao))
+			$html .= $this->getHtmlRowBE('MOIP_NASCIMENTO_TITULAR_CARTAO', $paymentTable->nascimento_titular_cartao);
+		if (!empty($paymentTable->telefone_titular_cartao))
+			$html .= $this->getHtmlRowBE('MOIP_TELEFONE_TITULAR_CARTAO', $paymentTable->telefone_titular_cartao);
+		if (!empty($paymentTable->cpf_titular_cartao))
+			$html .= $this->getHtmlRowBE('MOIP_CPF_TITULAR_CARTAO', $paymentTable->cpf_titular_cartao);
         $html .= $this->getHtmlRowBE('MOIP_LOG', $paymentTable->log);
         $html .= '</table>' . "\n";
         return $html;
@@ -1290,7 +1298,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 
 		$params = $this->getXmlConsulta($method, $order);		
 		$xml = $this->Moip_requestPost( $params, $this->url_request, $method, $headers );		
-
+		
 		$arr = array(
 			"status"=> $xml->Resposta->Status,
 			"token"	=> $xml->Resposta->Token,
@@ -1308,15 +1316,16 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		$campo_bairro = $method->campo_bairro;
 		$campo_numero = $method->campo_numero;
 		$campo_complemento = $method->campo_complemento;
+		$campo_logradouro = $method->campo_logradouro;
 		
 		$order_total = round($order['details']["BT"]->order_total,2);
 		$order_number = $order['details']["BT"]->order_number;
 		$customer_name = $order["details"]["BT"]->first_name .' '. $order["details"]["BT"]->last_name;
 		$order_email = $order["details"]["BT"]->email;
 		$customer_number = $order["details"]["BT"]->virtuemart_user_id;
-		$customer_address = $order["details"]["BT"]->$campo_complemento;
+		$customer_address = $order["details"]["BT"]->$campo_logradouro;
 		$customer_address_number = $order["details"]["BT"]->$campo_numero;
-		$customer_address_complemento = $order["details"]["BT"]->address_2;
+		$customer_address_complemento = $order["details"]["BT"]->$campo_complemento;
 		$customer_bairro = $order["details"]["BT"]->$campo_bairro;
 		$customer_city = $order["details"]["BT"]->city;
 		$customer_state = ShopFunctions::getStateByID($order["details"]["BT"]->virtuemart_state_id, "state_2_code");	

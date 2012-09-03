@@ -7,7 +7,7 @@ Passo 1 - Crie sua conta Moip ( caso não exista ) e solicite a ativação da API M
 Passo 2 - Configure o retorno automático em Menu Meus Dados / Notificação das Transações. 
 A url tem que ser assim: http://urldositecom.br//index.php?option=com_virtuemart&view=pluginresponse&task=plugin&tmpl=component&task=pluginresponsereceived&pm=6&nasp=1
 
-Passo 2.1 - Configure os 3 campos extras: "numero", "bairro" e "complemento". Caso o campo não exista, ele deve ser criado.
+Passo 2.1 - Configure os 4 campos extras: "logradouro", "numero", "bairro" e "complemento". Caso o campo não exista, ele deve ser criado.
 
 Passo 3 - Habilite o plugin aqui Administrar Plugins
 Passo 4 - Instale Plugin por esta tela Métodos de pagamento
@@ -15,8 +15,8 @@ Passo 4.1 - Clique em Novo Método de Pagamento e preencha as informações:
 * Nome do Pagamento: Cartões de crédito e débito, transferência e boleto bancário ( Moip )
 * Publicado: Sim
 * Descrição do pagamento: Pague com cartão de crédito, boleto ou saldo Moip
-* Método de pagamento: Moip
-* Grupo de Compradores: -default-
+* Método de pagamento: VM Payment - Moip Checkout Transparente
+* Grupo de Compradores: -default- e -anonymous-
 Passo 4.2 - Clique em Salvar.
 Passo 5 - Na aba configurações, preencha os dados:
 

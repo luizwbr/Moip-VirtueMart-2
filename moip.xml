@@ -125,6 +125,7 @@
 
 		
 		<param type="vmspacer" default="Campos Extras Obrigatórios no Formulário de Registro" />
+		<param name="campo_logradouro" type="vmfield" size="30"  label="Campo Logradouro ( do endereço )" description="Nome do campo Logradouro ( endereço mesmo )" default="address_1"/> 		
         <param name="campo_bairro" type="vmfield" size="30"  label="Campo Bairro" description="Nome do campo Bairro" default="bairro"/> 		
         <param name="campo_numero" type="vmfield" size="30"  label="Campo Número ( do endereço )" description="Nome do campo Número do Endereço do usuário" default="numero"/> 		
         <param name="campo_complemento" type="vmfield" size="30"  label="Campo Complemento ( do endereço )" description="Nome do campo Complemento do Endereço" default="address_2"/> 		

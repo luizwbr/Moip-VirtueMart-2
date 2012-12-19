@@ -6,7 +6,7 @@
     <authorUrl>http://www.webgenium.com.br</authorUrl>
     <copyright>Copyright (C) 2012. All rights reserved.</copyright>
     <license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
-    <version>1.6</version>
+    <version>1.7</version>
     <description>Plugin de pagamento
 	&lt;div style=&quot;background:#E5F5FF;border:1px solid #99D6FF;padding:10px;margin:10px; -box-shadow: inset 0px 0px 10px #fff, 0px 0px 5px #ccc; -webkit-box-shadow: inset 0px 0px 10px #fff, 0px 0px 5px #ccc; -moz-box-shadow: inset 0px 0px 10px #fff, 0px 0px 5px #ccc;font-weight:normal;&quot;&gt;
 		&lt;h1&gt;Plugin de pagamento MoIP para Virtuemart 2.0 - Api Transparente.&lt;/h1&gt;
@@ -41,8 +41,8 @@
 		&lt;div&gt; &lt;br /&gt;Configuração Parcelamento &lt;/div&gt;		
 		&lt;div&gt;** Max. Parcelas Sem Juros &lt;b&gt; 3 &lt;/b&gt;&lt;/div&gt;		
 		&lt;div&gt;** Max. Parcelas Com Juros &lt;b&gt; 12 &lt;/b&gt;&lt;/div&gt;		
-		&lt;div&gt;** Taxa de Juros Crédito à vista &lt;b&gt; (0.035) &lt;/b&gt;&lt;/div&gt;		
-		&lt;div&gt;** Taxa de Juros Parcelado &lt;b&gt; (0.045) &lt;/b&gt;&lt;/div&gt;				
+		&lt;div&gt;** Taxa de Juros Crédito à vista &lt;b&gt; (1.99) &lt;/b&gt;&lt;/div&gt;		
+		&lt;div&gt;** Taxa de Juros Parcelado &lt;b&gt; (1.99) &lt;/b&gt;&lt;/div&gt;				
 		&lt;div&gt; &lt;br /&gt;Formas de Pagamento Aceitas &lt;/div&gt;		
 		&lt;div&gt;* Ativar Boleto &lt;b&gt; (Sim ou Não) &lt;/b&gt;&lt;/div&gt;		
 		&lt;div&gt;* Ativar Cartões de Crédito &lt;b&gt; (Sim ou Não) &lt;/b&gt;&lt;/div&gt;		
@@ -141,18 +141,13 @@
 		<param name="max_parcela_sem_juros" type="text" size="10"  label="Máx. parcelas Sem Juros" description="Número total de parcelas sem juros" default="3"/> 
         <param name="max_parcela_com_juros" type="text" size="10"  label="Máx. parcelas Com Juros" description="Número total de parcelas com juros" default="12" /> 
 		
-		<param name="taxa_credito" type="text" size="12"  label="Taxa Crédito à vista" description="Taxa para transações 1x no Crédito (0.01 = 1%)" default="0.035" />
-		<param name="taxa_parcelado" type="text" size="12"  label="Taxa Parcelado" description="Taxa para transações parcelado em mais de 2x no Crédito  (0.01 = 1%)" default="0.045"/>
+		<param name="taxa_credito" type="text" size="12"  label="Taxa Crédito à vista" description="Taxa para transações 1x no Crédito (1.99 = 1.99%)" default="1.99" />
+		<param name="taxa_parcelado" type="text" size="12"  label="Taxa Parcelado" description="Taxa para transações parcelado em mais de 2x no Crédito  (1.99 = 1.99%)" default="1.99"/>
 
 		<param type="vmspacer" default="Outras configurações" />
         <param name="valor_minimo" type="text" size="10"  label="Valor mínimo" description="Valor mínimo para compras na loja." default="0.01"/> 		
         <param name="mensagem_pagamento" type="text" size="60"  label="Mensagem Pagamento" description="Mensagem que aparece no ambiente do MoIP: Pagamento para a loja X." default="Pagamento para a loja X"/> 		
-				
-		<param name="compra_click" type="vmradio" class="switch2" default="0" label="Ativar Compra com 1-click *beta">
-			<option value="0">COM_VIRTUEMART_NO</option>            
-            <option value="1">COM_VIRTUEMART_YES</option>		
-		</param>
-		
+	
 		<param type="vmspacer" default="Formas de Pagamento Aceitas" />		
 
 		<param name="ativar_cartao" type="vmradio" class="switch2" default="1" label="Ativar Cartões de Crédito">

@@ -447,11 +447,11 @@ function efeito_divs(mostra,esconde,esconde2) {
 }
 
 var funcao_sucesso = function(data) {
-	console.log(data);
+	//console.log(data);
 	notificaPagamento(data);
 };
 
 var funcao_falha = function(data) {
-	console.log(data);
+	//console.log(data);
 	notificaPagamento(data);
 };

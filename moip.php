@@ -777,7 +777,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			$virtuemart_paymentmethod_id = $orderDetails['details']['BT']->virtuemart_paymentmethod_id;
 		
 			JHTML::_('behavior.modal');	
-			$url_recibo = JRoute::_('index.php?option=com_virtuemart&view=pluginresponse&tmpl=component&task=pluginresponsereceived&on='.$order_id.'&pm='.$virtuemart_paymentmethod_id);
+			$url_recibo = JRoute::_('/index.php?option=com_virtuemart&view=pluginresponse&tmpl=component&task=pluginresponsereceived&on='.$order_id.'&pm='.$virtuemart_paymentmethod_id);
 			$html = '<br /><b><a href="'.$url_recibo.'" class="modal" rel="{size: {x: 700, y: 500}, handler:\'iframe\'}" >Clique aqui para visualizar o status detalhado da transação no MoIP</a></b> <br /><br />';
 			JFactory::getApplication()->enqueueMessage(
 				$html, 'alert'
@@ -1502,6 +1502,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			$limite_parcelamento = $numero_parcelas;
 		}
 		
+		$asterisco = false;
 		for($i=$parcelas_juros; $i<=$limite_parcelamento; $i++) {
 			// verifica se o juros será para o emissor ou para o comprador
 			// caso o valor da parcela seja menor do que o permicodigo_moipo, não a exibe
@@ -1509,24 +1510,43 @@ class plgVmPaymentMoip extends vmPSPlugin {
 				continue;
 			}
 			//$valor_formatado_credito = 'R$ '.number_format($valor_parcela,2,',','.');
-			$valor_formatado_credito = $paymentCurrency->priceDisplay($valor_parcela,$paymentCurrency->payment_currency);
 			
 			if ($i==1) {
-				$valor_pedido 	= $order_total * (1+$method->taxa_credito); // calcula o valor da parcela
+				$valor_parcela 	= $order_total * (1+$method->taxa_credito); // calcula o valor da parcela
+
 			} else {
-				$valor_pedido = $order_total * (1+$method->taxa_parcelado); // calcula o valor da parcela
+				$valor_parcela = $this->calculaParcelaPRICE($order_total,$i,$method->taxa_parcelado);
+				//$valor_pedido = $order_total * (1+$method->taxa_parcelado); // calcula o valor da parcela
+				$asterisco = true;
 			}
-			$valor_parcela = $valor_pedido / $i;
+			$valor_formatado_credito = $paymentCurrency->priceDisplay($valor_parcela,$paymentCurrency->payment_currency);
+			//$valor_parcela = $valor_pedido / $i;
 			
-			$conteudo .= '<div class="field_visa"><label><input type="radio" value="'.$i.'" name="parcelamento" style="width:15px; height: 18px;"/>&nbsp;<span id="p0'.$i.'">'.$i.' x </span>&nbsp;<span class="asterisco">'.$valor_formatado_credito.'</span></label></div>';
+			$conteudo .= '<div class="field_visa"><label><input type="radio" value="'.$i.'" name="parcelamento" style="width:15px; height: 18px;"/>&nbsp;<span id="p0'.$i.'">'.$i.' x </span>&nbsp;<span class="asterisco">'.$valor_formatado_credito.' * </span></label></div>';
 			if ($limite_parcelamento == $i) {
 				break;
 			}
+		}
+		if ($asterisco) {
+			$conteudo .= "<div>* Valores sujeitos à alteração ao efetuar o pagamento via Cartão (".$method->taxa_parcelado."% a.m.).</div>";			
 		}
 		$conteudo .= '</div>';
 		return $conteudo;
 	}
 	
+	public function calculaParcelaPRICE($Valor, $Parcelas, $Juros) {
+		$Juros = bcdiv($Juros,100,15);
+		$E=1.0;
+		$cont=1.0;
+		for($k=1;$k<=$Parcelas;$k++) {
+			$cont= bcmul($cont,bcadd($Juros,1,15),15);
+			$E=bcadd($E,$cont,15);
+		}
+		$E=bcsub($E,$cont,15);
+		$Valor = bcmul($Valor,$cont,15);
+		return round(bcdiv($Valor,$E,15),2);
+	}
+		
 	// status do pagamento da Moip
 	public function _getPaymentStatusNotificacao($method, $moip_status) {
 		if ($moip_status == 1) {

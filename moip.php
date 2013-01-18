@@ -1393,8 +1393,8 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			$inicio_parcelamento_juros = $max_parcela_sem_juros + 1; 
 		}
 		if ($max_parcela_com_juros > 0) {
-			$juros_parcelamento = $taxa_parcelado * 100;
-			$juros_credito_avista = $taxa_credito * 100;
+			$juros_parcelamento = $taxa_parcelado;
+			$juros_credito_avista = $taxa_credito;
 			// seta o parcelamento com juros para a primeira parcela no crédito
 			if ($max_parcela_sem_juros == 0) {
 					$xml_parc .= '<Parcelamento>

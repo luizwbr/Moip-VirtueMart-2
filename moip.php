@@ -24,7 +24,7 @@ if (!defined('_VALID_MOS') && !defined('_JEXEC'))
 if (!class_exists('vmPSPlugin'))
     require(JPATH_VM_PLUGINS . DS . 'vmpsplugin.php');
 
-class plgVmPaymentMoip extends vmPSPlugin {
+class plgVmPaymentMoip extends vmPSPlugin { 
 
     // instance of class
     public static $_this = false;

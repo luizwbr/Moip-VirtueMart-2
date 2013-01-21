@@ -1385,12 +1385,14 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		// taxa para crédito a vista
 		$inicio_parcelamento_juros = 2;
 		if ($max_parcela_sem_juros > 0) {
-			$xml_parc .= '<Parcelamento>
-			<MinimoParcelas>1</MinimoParcelas>
-			<MaximoParcelas>'.$max_parcela_sem_juros.'</MaximoParcelas>
-			<Juros>0</Juros>
-			</Parcelamento>';
-			$inicio_parcelamento_juros = $max_parcela_sem_juros + 1; 
+			if ($max_parcela_sem_juros != 1) {
+				$xml_parc .= '<Parcelamento>
+				<MinimoParcelas>1</MinimoParcelas>
+				<MaximoParcelas>'.$max_parcela_sem_juros.'</MaximoParcelas>
+				<Juros>0</Juros>
+				</Parcelamento>';
+				$inicio_parcelamento_juros = $max_parcela_sem_juros + 1; 
+			}
 		}
 		if ($max_parcela_com_juros > 0) {
 			$juros_parcelamento = $taxa_parcelado;

@@ -63,7 +63,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			'cost_percent_total' => array('', 'int'),
 			'tax_id' => array(0, 'int'),
 			'ativar_boleto' => array(0, 'int'),
-			'ativar_cartao' => array(0, 'int'),
+			'ativar_cartao' => array(0, 'int'),			
 			'ativar_debito' => array(0, 'int'),
 			'cartao_visa'=> array('', 'string'),
             'cartao_master'=> array('', 'string'),            
@@ -79,6 +79,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
             'campo_numero'=> array('', 'string'),	
             'campo_complemento'=> array('', 'string'),	
             'campo_logradouro'=> array('', 'string'),	
+            'load_squeezebox' => array(1, 'int'),
         );
         $this->setConfigParameterable($this->_configTableFieldName, $varsToPush);
 
@@ -170,6 +171,12 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		$url_redireciona_moip = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=pluginresponse&task=pluginnotification&tmpl=component&pm='.$order['details']['BT']->virtuemart_paymentmethod_id);
 		$url_pedidos = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=orders');
 		$url_recibo_moip = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=pluginresponse&task=pluginresponsereceived&on='.$this->order_id.'&pm='.$order['details']['BT']->virtuemart_paymentmethod_id);
+
+		// carrega ou não o squeezebox
+		$load_squeezebox = $method->load_squeezebox;
+		$sq_js = '<script type="text/javascript" language="javascript" src="'.$url_js.'SqueezeBox.js"></script>';
+		$sq_css = '<link href="'.$url_css.'SqueezeBox.css" rel="stylesheet" type="text/css"/>';
+
 		$doc->addCustomTag('
 			<script language="javascript">
 				jQuery.noConflict();
@@ -181,9 +188,13 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			<script type="text/javascript" charset="utf-8" language="javascript" src="'.$url_js.'moip.js"></script>
 			<script type="text/javascript" language="javascript" src="'.$url_js.'jquery.card.js"></script>
 			<script type="text/javascript" language="javascript" src="'.$url_js.'validar_cartao.js"></script>
+			'.($load_squeezebox!=0?$sq_js:'').'
 			<link href="'.$url_css.'css_pagamento.css" rel="stylesheet" type="text/css"/>
 			<link href="'.$url_css.'card.css" rel="stylesheet" type="text/css"/>
+			'.($load_squeezebox!=0?$sq_css:'').'
 		');
+
+
 
         $lang = JFactory::getLanguage();
         $filename = 'com_virtuemart';

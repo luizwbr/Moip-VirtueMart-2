@@ -107,7 +107,7 @@
 		default="default" hide_default="1" hide_none="1"
 		stripext="0"   exclude="^_" />	        
 
-		<param name="modo_teste" type="list" default="1" label="Modo de teste">
+		<param name="modo_teste" type="vmradio" default="1" label="Modo de teste">
             <option value="1">COM_VIRTUEMART_YES</option>
             <option value="0">COM_VIRTUEMART_NO</option>
         </param>
@@ -209,7 +209,12 @@
 			<option value="1">COM_VIRTUEMART_YES</option>
 		</param>		
 		
-		<param type="vmspacer" default="Extras" />		
+		<param type="vmspacer" default="Extras" />
+		<param name="load_squeezeboc" type="vmradio" default="1" label="Carregar SqueezeBox JS">
+            <option value="1">COM_VIRTUEMART_YES</option>
+            <option value="0">COM_VIRTUEMART_NO</option>
+        </param>
+
 		<param name="countries" type="vmcountries"  scope="com_virtuemart" default="" label="Países" description="Países para validar este pagamento"/>
 		<param name="min_amount" type="text"  label="Mínimo da Compra" description="Valor mínimo da compra pra utilizar a MoIP" />
 		<param name="max_amount" type="text"  label="Máximo da Compra" description="Valor Máximo da compra para utilizar a MoIP" />

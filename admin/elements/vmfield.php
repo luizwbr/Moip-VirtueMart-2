@@ -35,7 +35,7 @@ class JElementVmField extends JElement {
         $db =  JFactory::getDBO();
 
         $query = 'SELECT `name` AS value, title AS text FROM `#__virtuemart_userfields`
-               		WHERE `published` = 1 and (type = \'text\') ORDER BY `ordering` ASC '
+               		WHERE `published` = 1 and (type <> \'delimiter\' and type <> \'password\' and name <> \'agreed\' and type <> \'username\') ORDER BY `ordering` ASC '
         ;
 
 		$db->setQuery ($query);
@@ -44,6 +44,11 @@ class JElementVmField extends JElement {
 		foreach ($fields as $field) {
 			$field->text = JText::_ ($field->text). ' ('.$field->value.')';
 		}
+
+        $campo_nenhum = new stdClass;
+        $campo_nenhum->value = '';
+        $campo_nenhum->text = 'Nenhum';
+        array_unshift($fields, $campo_nenhum);
 
 		return JHTML::_ ('select.genericlist', $fields, $control_name . '[' . $name . ']', $class, 'value', 'text', $value, $control_name . $name);
     }

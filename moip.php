@@ -24,7 +24,7 @@ if (!defined('_VALID_MOS') && !defined('_JEXEC'))
 if (!class_exists('vmPSPlugin'))
     require(JPATH_VM_PLUGINS . DS . 'vmpsplugin.php');
 
-class plgVmPaymentMoip extends vmPSPlugin { 
+class plgVmPaymentMoip extends vmPSPlugin {
 
     // instance of class
     public static $_this = false;
@@ -63,7 +63,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			'cost_percent_total' => array('', 'int'),
 			'tax_id' => array(0, 'int'),
 			'ativar_boleto' => array(0, 'int'),
-			'ativar_cartao' => array(0, 'int'),
+			'ativar_cartao' => array(0, 'int'),			
 			'ativar_debito' => array(0, 'int'),
 			'cartao_visa'=> array('', 'string'),
             'cartao_master'=> array('', 'string'),            
@@ -78,7 +78,11 @@ class plgVmPaymentMoip extends vmPSPlugin {
             'campo_bairro'=> array('', 'string'),	
             'campo_numero'=> array('', 'string'),	
             'campo_complemento'=> array('', 'string'),	
-            'campo_logradouro'=> array('', 'string'),	
+            'campo_logradouro'=> array('', 'string'),
+            'campo_telefone'=> array('', 'string'),
+            'campo_cpf'=> array('', 'string'),
+            'campo_data_nascimento'=> array('', 'string'),
+            'load_squeezebox' => array(1, 'int'),
         );
         $this->setConfigParameterable($this->_configTableFieldName, $varsToPush);
 
@@ -170,6 +174,12 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		$url_redireciona_moip = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=pluginresponse&task=pluginnotification&tmpl=component&pm='.$order['details']['BT']->virtuemart_paymentmethod_id);
 		$url_pedidos = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=orders');
 		$url_recibo_moip = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=pluginresponse&task=pluginresponsereceived&on='.$this->order_id.'&pm='.$order['details']['BT']->virtuemart_paymentmethod_id);
+
+		// carrega ou não o squeezebox
+		$load_squeezebox = $method->load_squeezebox;
+		$sq_js = '<script type="text/javascript" language="javascript" src="'.$url_js.'SqueezeBox.js"></script>';
+		$sq_css = '<link href="'.$url_css.'SqueezeBox.css" rel="stylesheet" type="text/css"/>';
+
 		$doc->addCustomTag('
 			<script language="javascript">
 				jQuery.noConflict();
@@ -181,9 +191,13 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			<script type="text/javascript" charset="utf-8" language="javascript" src="'.$url_js.'moip.js"></script>
 			<script type="text/javascript" language="javascript" src="'.$url_js.'jquery.card.js"></script>
 			<script type="text/javascript" language="javascript" src="'.$url_js.'validar_cartao.js"></script>
+			'.($load_squeezebox!=0?$sq_js:'').'
 			<link href="'.$url_css.'css_pagamento.css" rel="stylesheet" type="text/css"/>
 			<link href="'.$url_css.'card.css" rel="stylesheet" type="text/css"/>
+			'.($load_squeezebox!=0?$sq_css:'').'
 		');
+
+
 
         $lang = JFactory::getLanguage();
         $filename = 'com_virtuemart';
@@ -398,7 +412,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 					<label for="name_on_card">'.JText::_('VMPAYMENT_MOIP_TRANSACTION_CARD_OWNER').'</label>
 					<input name="name_on_card" id="name_on_card" type="text">
 				</li> 
-				'.$this->getCamposCartao($order).'			
+				'.$this->getCamposCartao($order, $method).'
 				
 				<li>
 					<label for="card_number">'.JText::_('VMPAYMENT_MOIP_TRANSACTION_CARD_NUMBER').'</label>
@@ -497,34 +511,41 @@ class plgVmPaymentMoip extends vmPSPlugin {
 	/**
 	* Exibe os campos como hidden se não tiverem sido cadastrados no Virtuemart por padrão
 	**/
-	public function getCamposCartao($order) {
+	public function getCamposCartao($order, $method) {
 		$o = $order['details']['BT'];
 		$html = '';
 
-		if ($o->cpf == '') {
-			$html .='<li>
-						<label for="cpf_titular">'.JText::_('VMPAYMENT_MOIP_TRANSACTION_CPF').'</label>
-						<input name="cpf_titular" id="cpf_titular" type="text" maxlength="14" style="width: 135px"/>
-					</li> ';
-		} else {
-			$html .= '<input type="hidden" name="cpf_titular" id="cpf_titular" value="'.$o->cpf.'" />';
-		}		
-		if ($o->data_nascimento == '') {
-			$html .='<li>
-						<label for="nascimento_titular">'.JText::_('VMPAYMENT_MOIP_TRANSACTION_BIRTHDAY_DATE').'</label>
-						<input name="nascimento_titular" id="nascimento_titular" type="text" size="15" maxlength="10" style="width:100px"/>
-					</li> ';
-		} else {
-			$html .= '<input type="hidden" name="nascimento_titular" id="nascimento_titular" value="'.$o->data_nascimento.'" />';
+		// configuração dos campos
+        $campo_cpf      		= $method->campo_cpf;
+        $campo_data_nascimento  = $method->campo_data_nascimento;
+        $campo_telefone 		= $method->campo_telefone;
+
+        $valor_cpf = '';
+    	if (isset($o->$campo_cpf) and $o->$campo_cpf != '') {
+			$valor_cpf  = 'value="'.$o->$campo_cpf.'"';
+		}    
+		$html .='<li>
+					<label for="cpf_titular">'.JText::_('VMPAYMENT_MOIP_TRANSACTION_CPF').'</label>
+					<input name="cpf_titular" id="cpf_titular" type="text" maxlength="14" style="width: 135px" '.$valor_cpf.'/>
+				</li> ';
+
+		$valor_data_nascimento  = '';
+		if (isset($o->$campo_data_nascimento) and $o->$campo_data_nascimento != '') {
+			$valor_data_nascimento  = 'value="'.$o->$campo_data_nascimento.'"';
 		}
-		if ($o->phone_1 == '') {
-			$html .='<li>
-						<label for="telefone_titular">'.JText::_('VMPAYMENT_MOIP_TRANSACTION_PHONE').' </label>
-						<input name="telefone_titular" id="telefone_titular" type="text" size="25" maxlength="15" style="width: 135px"/>
-					</li> ';
-		} else {
-			$html .= '<input type="hidden" name="telefone_titular" id="telefone_titular" value="'.$o->phone_1.'" />';
-		}		
+		$html .='<li>
+					<label for="nascimento_titular">'.JText::_('VMPAYMENT_MOIP_TRANSACTION_BIRTHDAY_DATE').'</label>
+					<input name="nascimento_titular" id="nascimento_titular" type="text" size="15" maxlength="10" style="width:100px" '.$valor_data_nascimento.'/>
+				</li> ';
+
+		$valor_telefone = '';
+		if (isset($o->$campo_telefone) and $o->$campo_telefone != '') {
+			$valor_telefone  = 'value="'.$o->$campo_telefone.'"';
+		}
+		$html .='<li>
+					<label for="telefone_titular">'.JText::_('VMPAYMENT_MOIP_TRANSACTION_PHONE').' </label>
+					<input name="telefone_titular" id="telefone_titular" type="text" size="25" maxlength="15" style="width: 135px" '.$valor_telefone.'/>
+				</li> ';
 		return $html;
 	}
 	
@@ -1385,12 +1406,14 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		// taxa para crédito a vista
 		$inicio_parcelamento_juros = 2;
 		if ($max_parcela_sem_juros > 0) {
-			$xml_parc .= '<Parcelamento>
-			<MinimoParcelas>1</MinimoParcelas>
-			<MaximoParcelas>'.$max_parcela_sem_juros.'</MaximoParcelas>
-			<Juros>0</Juros>
-			</Parcelamento>';
-			$inicio_parcelamento_juros = $max_parcela_sem_juros + 1; 
+			if ($max_parcela_sem_juros != 1) {
+				$xml_parc .= '<Parcelamento>
+				<MinimoParcelas>1</MinimoParcelas>
+				<MaximoParcelas>'.$max_parcela_sem_juros.'</MaximoParcelas>
+				<Juros>0</Juros>
+				</Parcelamento>';
+				$inicio_parcelamento_juros = $max_parcela_sem_juros + 1; 
+			}
 		}
 		if ($max_parcela_com_juros > 0) {
 			$juros_parcelamento = $taxa_parcelado;

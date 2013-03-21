@@ -78,10 +78,14 @@ class plgVmPaymentMoip extends vmPSPlugin {
             'campo_bairro'=> array('', 'string'),	
             'campo_numero'=> array('', 'string'),	
             'campo_complemento'=> array('', 'string'),	
+<<<<<<< HEAD
             'campo_logradouro'=> array('', 'string'),
             'campo_telefone'=> array('', 'string'),
             'campo_cpf'=> array('', 'string'),
             'campo_data_nascimento'=> array('', 'string'),
+=======
+            'campo_logradouro'=> array('', 'string'),	
+>>>>>>> 4071c633348a3beaba5417957caba4e3a32e3c19
             'load_squeezebox' => array(1, 'int'),
         );
         $this->setConfigParameterable($this->_configTableFieldName, $varsToPush);

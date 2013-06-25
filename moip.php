@@ -789,6 +789,10 @@ class plgVmPaymentMoip extends vmPSPlugin {
      * @author Valerie Isaksen
      */
     public function plgVmOnShowOrderFEPayment($virtuemart_order_id, $virtuemart_paymentmethod_id, &$payment_name) {
+    	$mainframe = JFactory::getApplication();		
+		if($mainframe->isAdmin()) {
+			return;
+		}
 
 		$view = JRequest::getVar('view');
 		if ($view=='orders') {

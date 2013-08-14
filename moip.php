@@ -793,6 +793,13 @@ class plgVmPaymentMoip extends vmPSPlugin {
 		if($mainframe->isAdmin()) {
 			return;
 		}
+		
+		if (!($method = $this->getVmPluginMethod ($virtuemart_paymentmethod_id))) {
+			return NULL; // Another method was selected, do nothing
+		}
+		if (!$this->selectedThisElement ($method->payment_element)) {
+			return FALSE;
+		}
 
 		$view = JRequest::getVar('view');
 		if ($view=='orders') {

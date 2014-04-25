@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <install version="1.5" type="plugin" group="vmpayment" method="upgrade">
     <name>VM Payment, MoIP Checkout Transparente</name>
-    <creationDate>Março 2013</creationDate>
+    <creationDate>25 Abril 2014</creationDate>
     <author>Luiz Felipe Weber</author>
     <authorUrl>http://www.webgenium.com.br</authorUrl>
-    <copyright>Copyright (C) 2012. All rights reserved.</copyright>
+    <copyright>Copyright (C) 2014. All rights reserved.</copyright>
     <license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
-    <version>1.9.1</version>
+    <version>1.9.3</version>
     <description>Plugin de pagamento
 	&lt;div style=&quot;background:#E5F5FF;border:1px solid #99D6FF;padding:10px;margin:10px; -box-shadow: inset 0px 0px 10px #fff, 0px 0px 5px #ccc; -webkit-box-shadow: inset 0px 0px 10px #fff, 0px 0px 5px #ccc; -moz-box-shadow: inset 0px 0px 10px #fff, 0px 0px 5px #ccc;font-weight:normal;&quot;&gt;
 		&lt;h1&gt;Plugin de pagamento MoIP para Virtuemart 2.0 - Api Transparente.&lt;/h1&gt;
@@ -226,6 +226,11 @@
 		<param name="cost_per_transaction" type="text"  label="Custo por Transação" description="Custo total por transação" />
 		<param name="cost_percent_total" type="text"  label="Custo percentual total" description="Custo percentual total pela venda" />
 		<param name="tax_id" type="vmtaxes" scope="com_virtuemart"  label="Tarifa/Imposto" description="Imposto ou tarifa aplicada" />
+		
+		<param name="modo_calculo_desconto" type="list" default="1" label="Modo de cálculo de descontos/tarifas">
+            <option value="1">Modo Simples ( desconto normal )</option>
+            <option value="2">Modo VirtueMart ( desconto progressivo )</option>
+        </param>
 		
 		<param type="spacer"/>		
 		<param type="vmabout" path="plugins/vmpayment/moip/" />		

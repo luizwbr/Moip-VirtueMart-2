@@ -38,52 +38,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
         $this->tableFields = array_keys($this->getTableSQLFields());
 		$this->_tablepkey = 'id'; 
 		$this->_tableId = 'id'; 
-        $varsToPush = array('payment_logos' => array('', 'char'),
-            'modo_teste' => array('', 'int'),
-            'token_teste' => array('', 'string'),
-            'chave_teste' => array('', 'string'),
-			'token_producao' => array('', 'string'),
-            'chave_producao' => array('', 'string'),
-            'valor_minimo' => array('', 'string'),            
-            'mensagem_pagamento' => array('', 'string'),            
-            //'parcelamento'=> array('', 'string'),
-            'max_parcela_sem_juros' => array('', 'string'),
-            'max_parcela_com_juros' => array('', 'string'),			
-			'taxa_credito'=> array('', 'string'),
-            'taxa_parcelado'=> array('', 'string'),
-            'transacao_concluida'=> array('', 'char'),
-            'transacao_em_analise'=> array('', 'char'),
-            'transacao_estornada'=> array('', 'char'),
-            'transacao_cancelada'=> array('', 'char'),
-            'transacao_nao_finalizada'=> array('', 'char'),
-			'countries' => array('', 'char'),
-			'min_amount' => array('', 'int'),
-			'max_amount' => array('', 'int'),
-			'cost_per_transaction' => array('', 'int'),
-			'cost_percent_total' => array('', 'int'),
-			'tax_id' => array(0, 'int'),
-			'ativar_boleto' => array(0, 'int'),
-			'ativar_cartao' => array(0, 'int'),			
-			'ativar_debito' => array(0, 'int'),
-			'cartao_visa'=> array('', 'string'),
-            'cartao_master'=> array('', 'string'),            
-            'cartao_diners'=> array('', 'string'),
-            'cartao_amex'=> array('', 'string'),
-            'cartao_hipercard'=> array('', 'string'),
-            'debito_bb'=> array('', 'string'),
-            'debito_bradesco'=> array('', 'string'),
-            'debito_banrisul'=> array('', 'string'),
-            'debito_itau'=> array('', 'string'),
-            'boleto_bradesco'=> array('', 'string'),	
-            'campo_bairro'=> array('', 'string'),	
-            'campo_numero'=> array('', 'string'),	
-            'campo_complemento'=> array('', 'string'),	
-            'campo_logradouro'=> array('', 'string'),
-            'campo_telefone'=> array('', 'string'),
-            'campo_cpf'=> array('', 'string'),
-            'campo_data_nascimento'=> array('', 'string'),
-            'load_squeezebox' => array(1, 'int'),
-        );
+		$varsToPush = $this->getVarsToPush ();
         $this->setConfigParameterable($this->_configTableFieldName, $varsToPush);
 
 		$this->domdocument = false;
@@ -115,7 +70,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
     function getTableSQLFields() {
 		// tabela com as configurações de cada transação Moip
         $SQLfields = array(
-            'id' => 'tinyint(1) unsigned NOT NULL AUTO_INCREMENT',
+            'id' => 'bigint(15) unsigned NOT NULL AUTO_INCREMENT',
             'codigo_moip' => ' varchar(25) NOT NULL',
             'token_api' => ' varchar(150) NOT NULL',
             'virtuemart_order_id' => 'int(11) UNSIGNED DEFAULT NULL',
@@ -332,7 +287,7 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			</div>			
 			</div>
 
-			<div id="container" class="div_pagamentos">';
+			<div id="container_moip" class="div_pagamentos">';
 			
 			if ($method->ativar_boleto) {
 				$conteudo .= $this->getPagamentoBoleto();
@@ -350,8 +305,8 @@ class plgVmPaymentMoip extends vmPSPlugin {
 			<br style='clear:both'/>
 			
 			<script language='javascript'>
-				jQuery('#container form:first').show();				
-				jQuery('#container input[type=radio][name=toggle_pagamentos]:first').attr('checked','checked');
+				jQuery('#container_moip form:first').show();				
+				jQuery('#container_moip input[type=radio][name=toggle_pagamentos]:first').attr('checked','checked');
 			</script>";
 			
 		return $conteudo;
@@ -656,6 +611,106 @@ class plgVmPaymentMoip extends vmPSPlugin {
             $cost_percent_total = $method->cost_percent_total;
         }
         return ($method->cost_per_transaction + ($cart_prices['salesPrice'] * $cost_percent_total * 0.01));
+    }
+
+    function setCartPrices (VirtueMartCart $cart, &$cart_prices, $method) {
+
+        if ($method->modo_calculo_desconto == '2') {
+            return parent::setCartPrices($cart, &$cart_prices, $method);
+        } else {
+
+            if (!class_exists ('calculationHelper')) {
+                require(JPATH_VM_ADMINISTRATOR . DS . 'helpers' . DS . 'calculationh.php');
+            }
+            $_psType = ucfirst ($this->_psType);
+            $calculator = calculationHelper::getInstance ();
+
+            $cart_prices[$this->_psType . 'Value'] = $calculator->roundInternal ($this->getCosts ($cart, $method, $cart_prices), 'salesPrice');
+
+            /*
+            if($this->_psType=='payment'){
+                $cartTotalAmountOrig=$this->getCartAmount($cart_prices);
+                $cartTotalAmount=($cartTotalAmountOrig + $method->cost_per_transaction) / (1 -($method->cost_percent_total * 0.01));
+                $cart_prices[$this->_psType . 'Value'] = $cartTotalAmount - $cartTotalAmountOrig;
+            }
+            */
+
+            $taxrules = array();
+            if(isset($method->tax_id) and (int)$method->tax_id === -1){
+
+            } else if (!empty($method->tax_id)) {
+                $cart_prices[$this->_psType . '_calc_id'] = $method->tax_id;
+
+                $db = JFactory::getDBO ();
+                $q = 'SELECT * FROM #__virtuemart_calcs WHERE `virtuemart_calc_id`="' . $method->tax_id . '" ';
+                $db->setQuery ($q);
+                $taxrules = $db->loadAssocList ();
+
+                if(!empty($taxrules) ){
+                    foreach($taxrules as &$rule){
+                        if(!isset($rule['subTotal'])) $rule['subTotal'] = 0;
+                        if(!isset($rule['taxAmount'])) $rule['taxAmount'] = 0;
+                        $rule['subTotalOld'] = $rule['subTotal'];
+                        $rule['taxAmountOld'] = $rule['taxAmount'];
+                        $rule['taxAmount'] = 0;
+                        $rule['subTotal'] = $cart_prices[$this->_psType . 'Value'];
+                    }
+                }
+            } else {
+                $taxrules = array_merge($calculator->_cartData['VatTax'],$calculator->_cartData['taxRulesBill']);
+
+                if(!empty($taxrules) ){
+                    $denominator = 0.0;
+                    foreach($taxrules as &$rule){
+                        //$rule['numerator'] = $rule['calc_value']/100.0 * $rule['subTotal'];
+                        if(!isset($rule['subTotal'])) $rule['subTotal'] = 0;
+                        if(!isset($rule['taxAmount'])) $rule['taxAmount'] = 0;
+                        $denominator += ($rule['subTotal']-$rule['taxAmount']);
+                        $rule['subTotalOld'] = $rule['subTotal'];
+                        $rule['subTotal'] = 0;
+                        $rule['taxAmountOld'] = $rule['taxAmount'];
+                        $rule['taxAmount'] = 0;
+                        //$rule['subTotal'] = $cart_prices[$this->_psType . 'Value'];
+                    }
+                    if(empty($denominator)){
+                        $denominator = 1;
+                    }
+
+                    foreach($taxrules as &$rule){
+                        $frac = ($rule['subTotalOld']-$rule['taxAmountOld'])/$denominator;
+                        $rule['subTotal'] = $cart_prices[$this->_psType . 'Value'] * $frac;
+                        vmdebug('Part $denominator '.$denominator.' $frac '.$frac,$rule['subTotal']);
+                    }
+                }
+            }
+
+
+            if(empty($method->cost_per_transaction)) $method->cost_per_transaction = 0.0;
+            if(empty($method->cost_percent_total)) $method->cost_percent_total = 0.0;
+
+            if (count ($taxrules) > 0 ) {
+
+                $cart_prices['salesPrice' . $_psType] = $calculator->roundInternal ($calculator->executeCalculation ($taxrules, $cart_prices[$this->_psType . 'Value'],true,false), 'salesPrice');
+                //vmdebug('I am in '.get_class($this).' and have this rules now',$taxrules,$cart_prices[$this->_psType . 'Value'],$cart_prices['salesPrice' . $_psType]);
+                $cart_prices[$this->_psType . 'Tax'] = $calculator->roundInternal (($cart_prices['salesPrice' . $_psType] -  $cart_prices[$this->_psType . 'Value']), 'salesPrice');
+                reset($taxrules);
+                $taxrule =  current($taxrules);
+                $cart_prices[$this->_psType . '_calc_id'] = $taxrule['virtuemart_calc_id'];
+
+                foreach($taxrules as &$rule){
+                    if(isset($rule['subTotalOld'])) $rule['subTotal'] += $rule['subTotalOld'];
+                    if(isset($rule['taxAmountOld'])) $rule['taxAmount'] += $rule['taxAmountOld'];
+                }
+
+            } else {
+                $cart_prices['salesPrice' . $_psType] = $cart_prices[$this->_psType . 'Value'];
+                $cart_prices[$this->_psType . 'Tax'] = 0;
+                $cart_prices[$this->_psType . '_calc_id'] = 0;
+            }
+
+
+            return $cart_prices['salesPrice' . $_psType];
+        }
     }
 
     /**

@@ -400,7 +400,7 @@ function notificaPagamento(data) {
 						mensagem_pagamento += 'Clique no <a href="'+url_recibo_moip+'">link</a> para acessar os detalhes do pedido.';
 						jQuery('#div_erro_conteudo').show().html(data.Mensagem+'<br /><br />'+mensagem_pagamento);
 					}
-					jQuery('#container form').parent().hide('slow');
+					jQuery('#container_moip form').parent().hide('slow');
 					jQuery('#div_erro_conteudo').animate({"padding":"20px","font-size":"15px"}, 1000);
 
 				} else {
@@ -419,7 +419,7 @@ function notificaPagamento(data) {
 					
 					if (mensagem == 'Pagamento já foi realizado') {
 						mensagem +='<br/> <a href="'+url_recibo_moip+'">Clique aqui para ser redirecionado</a> para o status do Pagamento.';
-						jQuery('#container form').parent().hide('slow');
+						jQuery('#container_moip form').parent().hide('slow');
 					}
 					
 					jQuery('#div_erro_conteudo').show().html(mensagem+'<br />');					
@@ -436,7 +436,7 @@ function notificaPagamento(data) {
 }
 
 function redireciona_recibo() {
-	jQuery('#container form').hide();
+	jQuery('#container_moip form').hide();
 	location.href = url_recibo_moip;
 }
 
